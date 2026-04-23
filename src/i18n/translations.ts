@@ -134,6 +134,6 @@ export const translations = {
     footer: "Stylo · Made with love and AI",
     mock: "This is a demo — real AI analysis coming soon",
   },
-} as const;
+};
 
-export type Translation = typeof translations.tr;
+export type Translation = (typeof translations)["tr"];
