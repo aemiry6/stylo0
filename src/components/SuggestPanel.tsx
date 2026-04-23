@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Briefcase, Heart, Coffee, Dumbbell, PartyPopper, Plane, Sun, Cloud, CloudRain, Snowflake, Flame, Loader2, Sparkles, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageProvider";
