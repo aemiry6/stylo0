@@ -1,54 +1,53 @@
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageProvider";
 import { ArrowRight } from "lucide-react";
-
-const items = [
-  { emoji: "👕", color: "Mercan", type: "Tişört", texture: "Pamuk", weight: "İnce", season: "Yaz", swatch: "bg-gradient-coral", colorEn: "Coral", typeEn: "T-shirt", textureEn: "Cotton", weightEn: "Light", seasonEn: "Summer" },
-  { emoji: "👖", color: "İndigo", type: "Kot", texture: "Denim", weight: "Orta", season: "4 mevsim", swatch: "bg-[hsl(220_60%_45%)]", colorEn: "Indigo", typeEn: "Jeans", textureEn: "Denim", weightEn: "Medium", seasonEn: "All season" },
-  { emoji: "🧥", color: "Lavanta", type: "Ceket", texture: "Yün", weight: "Kalın", season: "Sonbahar", swatch: "bg-gradient-lavender", colorEn: "Lavender", typeEn: "Jacket", textureEn: "Wool", weightEn: "Heavy", seasonEn: "Autumn" },
-  { emoji: "👟", color: "Beyaz", type: "Sneaker", texture: "Deri", weight: "—", season: "4 mevsim", swatch: "bg-card border", colorEn: "White", typeEn: "Sneaker", textureEn: "Leather", weightEn: "—", seasonEn: "All season" },
-  { emoji: "👗", color: "Sarı", type: "Elbise", texture: "Keten", weight: "İnce", season: "Yaz", swatch: "bg-gradient-sunshine", colorEn: "Yellow", typeEn: "Dress", textureEn: "Linen", weightEn: "Light", seasonEn: "Summer" },
-  { emoji: "🧶", color: "Mint", type: "Kazak", texture: "Örme", weight: "Orta", season: "Kış", swatch: "bg-gradient-mint", colorEn: "Mint", typeEn: "Sweater", textureEn: "Knit", weightEn: "Medium", seasonEn: "Winter" },
-];
+import { useWardrobe } from "@/state/WardrobeContext";
 
 type Props = { onNext: () => void };
 
 export const WardrobeGrid = ({ onNext }: Props) => {
   const { t, lang } = useLang();
+  const { wardrobe } = useWardrobe();
+
+  if (wardrobe.length === 0) return null;
+
   return (
     <section id="wardrobe" className="container py-20 md:py-24">
       <div className="mx-auto mb-10 max-w-2xl text-center">
         <h2 className="font-display text-4xl font-bold tracking-tight md:text-5xl">{t.wardrobe.title}</h2>
         <p className="mt-3 text-lg text-muted-foreground">
-          {t.wardrobe.subtitle.replace("{count}", String(items.length))}
+          {t.wardrobe.subtitle.replace("{count}", String(wardrobe.length))}
         </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((it, i) => (
+        {wardrobe.map((it, i) => (
           <div
-            key={i}
-            className="group rounded-3xl border border-border bg-card p-5 shadow-card transition-bounce hover:-translate-y-1 hover:shadow-pop"
+            key={it.id}
+            className="group rounded-3xl border border-border bg-card p-5 shadow-card transition-bounce hover:-translate-y-1 hover:shadow-pop animate-fade-in"
             style={{ animationDelay: `${i * 60}ms` }}
           >
             <div className="mb-4 flex items-center gap-4">
-              <div className={`flex h-16 w-16 items-center justify-center rounded-2xl text-3xl shadow-soft ${it.swatch}`}>
-                {it.emoji}
+              <div
+                className="flex h-16 w-16 items-center justify-center rounded-2xl text-3xl shadow-soft"
+                style={{ backgroundColor: it.color_hex }}
+              >
+                <span className="drop-shadow">{it.emoji}</span>
               </div>
-              <div>
-                <div className="font-display text-xl font-bold">
-                  {lang === "tr" ? it.type : it.typeEn}
+              <div className="min-w-0 flex-1">
+                <div className="font-display text-xl font-bold truncate">
+                  {lang === "tr" ? it.type_tr : it.type_en}
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  {lang === "tr" ? it.color : it.colorEn}
+                <div className="text-sm text-muted-foreground truncate">
+                  {lang === "tr" ? it.color_tr : it.color_en}
                 </div>
               </div>
             </div>
 
             <div className="flex flex-wrap gap-1.5">
-              <Tag label={t.wardrobe.tags.texture} value={lang === "tr" ? it.texture : it.textureEn} />
-              <Tag label={t.wardrobe.tags.weight} value={lang === "tr" ? it.weight : it.weightEn} />
-              <Tag label={t.wardrobe.tags.season} value={lang === "tr" ? it.season : it.seasonEn} />
+              <Tag label={t.wardrobe.tags.texture} value={lang === "tr" ? it.texture_tr : it.texture_en} />
+              <Tag label={t.wardrobe.tags.weight} value={weightLabel(it.weight, lang)} />
+              <Tag label={t.wardrobe.tags.season} value={lang === "tr" ? it.season_tr : it.season_en} />
             </div>
           </div>
         ))}
@@ -66,6 +65,15 @@ export const WardrobeGrid = ({ onNext }: Props) => {
       </div>
     </section>
   );
+};
+
+const weightLabel = (w: "light" | "medium" | "heavy", lang: "tr" | "en") => {
+  const map = {
+    light: { tr: "İnce", en: "Light" },
+    medium: { tr: "Orta", en: "Medium" },
+    heavy: { tr: "Kalın", en: "Heavy" },
+  };
+  return map[w][lang];
 };
 
 const Tag = ({ label, value }: { label: string; value: string }) => (
