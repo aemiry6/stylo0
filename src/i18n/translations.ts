@@ -1,0 +1,139 @@
+export type Lang = "tr" | "en";
+
+export const translations = {
+  tr: {
+    brand: "Stylo",
+    nav: {
+      how: "Nasıl çalışır",
+      try: "Hemen Dene",
+    },
+    hero: {
+      badge: "✨ Yapay zekâ destekli kişisel stilist",
+      title1: "Bugün ne giysem?",
+      title2: "sorusunu sonsuza dek kapatıyoruz.",
+      subtitle:
+        "Dolabını bir kez yükle. Stylo her parçayı tanısın — renk, doku, tür, kalınlık. Sonra havaya ve planına göre sana özel kombini saniyeler içinde önersin.",
+      cta: "Dolabımı yükle",
+      ctaSecondary: "Nasıl çalıştığını gör",
+    },
+    steps: {
+      title: "3 adımda dışarı çık",
+      subtitle: "Karmaşık değil. Hızlı, eğlenceli ve gerçekten işe yarıyor.",
+      one: { t: "Dolabını çek", d: "Fotoğrafla ya da kısa bir video ile dolabını paylaş." },
+      two: { t: "AI tanısın", d: "Her parçayı renk, tür, doku ve kalınlık ile etiketleriz." },
+      three: { t: "Kombin gelsin", d: "Hava + planına göre saniyeler içinde önerimiz hazır." },
+    },
+    upload: {
+      title: "Dolabını yükle",
+      subtitle: "Fotoğraf çek veya kısa bir video bırak. Her şey burada başlar.",
+      drop: "Buraya bırak ya da seç",
+      hint: "JPG, PNG veya MP4 — en iyi sonuç için iyi ışıkta çek",
+      photo: "Fotoğraf",
+      video: "Video",
+      analyze: "Analiz et",
+      analyzing: "Stylo dolabını tanıyor…",
+    },
+    wardrobe: {
+      title: "Dolabın hazır",
+      subtitle: "Stylo {count} parça tanıdı. İstediğin zaman düzenleyebilirsin.",
+      next: "Kombin önerisi al",
+      tags: { color: "Renk", type: "Tür", texture: "Doku", weight: "Kalınlık", season: "Mevsim" },
+    },
+    suggest: {
+      title: "Bugün için kombin",
+      subtitle: "Plan ve hava durumunu seç, gerisini bize bırak.",
+      purpose: "Bugün ne yapıyorsun?",
+      purposes: {
+        work: "İş",
+        date: "Randevu",
+        casual: "Günlük",
+        sport: "Spor",
+        party: "Parti",
+        travel: "Seyahat",
+      },
+      weather: "Bugünün havası",
+      generate: "Kombinimi öner",
+      generating: "Stilini hazırlıyoruz…",
+    },
+    outfit: {
+      title: "İşte bugünün kombini",
+      why: "Neden bu kombin?",
+      whyText:
+        "Hafif yağmur ihtimaline karşı orta kalınlıkta bir üst seçtik, mercan tişörtün cildine sıcaklık katacak. Beyaz sneaker iş gününü rahatlatır, lavanta ceket modern bir hava verir.",
+      like: "Bayıldım",
+      shuffle: "Başka bir kombin",
+      restart: "Baştan başla",
+      parts: { top: "Üst", bottom: "Alt", shoes: "Ayakkabı", outer: "Dış giyim", accessory: "Aksesuar" },
+    },
+    weather: { sunny: "Güneşli", cloudy: "Bulutlu", rainy: "Yağmurlu", cold: "Soğuk", hot: "Sıcak" },
+    footer: "Stylo · Sevgiyle ve yapay zekâyla yapıldı",
+    mock: "Bu bir demo — yakında gerçek AI analizi geliyor",
+  },
+  en: {
+    brand: "Stylo",
+    nav: { how: "How it works", try: "Try it now" },
+    hero: {
+      badge: "✨ AI-powered personal stylist",
+      title1: "What should I wear today?",
+      title2: "We're closing that question forever.",
+      subtitle:
+        "Upload your wardrobe once. Stylo identifies every piece — color, texture, type, weight. Then it picks the perfect outfit for your weather and your day, in seconds.",
+      cta: "Upload my wardrobe",
+      ctaSecondary: "See how it works",
+    },
+    steps: {
+      title: "Out the door in 3 steps",
+      subtitle: "No friction. Fast, fun, and actually useful.",
+      one: { t: "Show your wardrobe", d: "Snap photos or take a quick video — that's it." },
+      two: { t: "AI identifies", d: "We tag every piece with color, type, texture, and weight." },
+      three: { t: "Get your outfit", d: "Based on weather + plans, your look is ready in seconds." },
+    },
+    upload: {
+      title: "Upload your wardrobe",
+      subtitle: "Photos or a short video. This is where the magic begins.",
+      drop: "Drop here or browse",
+      hint: "JPG, PNG or MP4 — good lighting helps a lot",
+      photo: "Photos",
+      video: "Video",
+      analyze: "Analyze",
+      analyzing: "Stylo is reading your wardrobe…",
+    },
+    wardrobe: {
+      title: "Your wardrobe is ready",
+      subtitle: "Stylo identified {count} pieces. You can edit anytime.",
+      next: "Get an outfit",
+      tags: { color: "Color", type: "Type", texture: "Texture", weight: "Weight", season: "Season" },
+    },
+    suggest: {
+      title: "Today's outfit",
+      subtitle: "Pick your plan and weather, leave the rest to us.",
+      purpose: "What's on your plan?",
+      purposes: {
+        work: "Work",
+        date: "Date",
+        casual: "Casual",
+        sport: "Sport",
+        party: "Party",
+        travel: "Travel",
+      },
+      weather: "Today's weather",
+      generate: "Style me",
+      generating: "Crafting your look…",
+    },
+    outfit: {
+      title: "Your outfit is ready",
+      why: "Why this outfit?",
+      whyText:
+        "We picked a mid-weight top in case of light rain — the coral tee adds warmth to your skin tone. White sneakers keep your workday easy, the lavender jacket adds a modern edge.",
+      like: "Love it",
+      shuffle: "Try another",
+      restart: "Start over",
+      parts: { top: "Top", bottom: "Bottom", shoes: "Shoes", outer: "Outer", accessory: "Accessory" },
+    },
+    weather: { sunny: "Sunny", cloudy: "Cloudy", rainy: "Rainy", cold: "Cold", hot: "Hot" },
+    footer: "Stylo · Made with love and AI",
+    mock: "This is a demo — real AI analysis coming soon",
+  },
+} as const;
+
+export type Translation = typeof translations.tr;
