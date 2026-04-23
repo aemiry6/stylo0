@@ -8,6 +8,7 @@ import { WardrobeGrid } from "@/components/WardrobeGrid";
 import { SuggestPanel } from "@/components/SuggestPanel";
 import { OutfitResult } from "@/components/OutfitResult";
 import { SiteFooter } from "@/components/SiteFooter";
+import { WardrobeProvider } from "@/state/WardrobeContext";
 
 type Stage = "intro" | "wardrobe" | "suggest" | "result";
 
@@ -77,7 +78,9 @@ const StyloApp = () => {
 
 const Index = () => (
   <LanguageProvider>
-    <StyloApp />
+    <WardrobeProvider>
+      <StyloApp />
+    </WardrobeProvider>
   </LanguageProvider>
 );
 
