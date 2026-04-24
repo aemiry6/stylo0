@@ -1,5 +1,9 @@
-import { useState } from "react";
-import { Briefcase, Heart, Coffee, Dumbbell, PartyPopper, Plane, Sun, Cloud, CloudRain, Snowflake, Flame, Loader2, Sparkles, MapPin } from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  Briefcase, Heart, Coffee, Dumbbell, PartyPopper, Plane,
+  Sun, Cloud, CloudRain, Snowflake, Flame, CloudSnow, CloudDrizzle, CloudFog,
+  Loader2, Sparkles, MapPin, AlertCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageProvider";
 import { useWardrobe } from "@/state/WardrobeContext";
@@ -11,25 +15,86 @@ type Weather = "sunny" | "cloudy" | "rainy" | "cold" | "hot";
 
 type Props = { onResult: () => void };
 
-const weatherCodeToKey = (code: number, temp: number): { key: Weather; temp: string } => {
-  // WMO weather codes (Open-Meteo)
-  const tempStr = `${Math.round(temp)}°`;
-  if ([95, 96, 99, 51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return { key: "rainy", temp: tempStr };
-  if ([71, 73, 75, 77, 85, 86].includes(code) || temp <= 5) return { key: "cold", temp: tempStr };
-  if (temp >= 28) return { key: "hot", temp: tempStr };
-  if ([0, 1].includes(code)) return { key: "sunny", temp: tempStr };
-  return { key: "cloudy", temp: tempStr };
+type WeatherData = {
+  key: Weather;
+  temp: number;
+  city: string;
+  condition: string;
+  conditionTr: string;
+  icon: typeof Sun;
 };
+
+const weatherFromCode = (code: number, temp: number): { key: Weather; condition: string; conditionTr: string; icon: typeof Sun } => {
+  // WMO weather codes (Open-Meteo)
+  if ([95, 96, 99].includes(code)) return { key: "rainy", condition: "Thunderstorm", conditionTr: "Gök gürültülü", icon: CloudRain };
+  if ([61, 63, 65, 80, 81, 82].includes(code)) return { key: "rainy", condition: "Rainy", conditionTr: "Yağmurlu", icon: CloudRain };
+  if ([51, 53, 55].includes(code)) return { key: "rainy", condition: "Drizzle", conditionTr: "Çiseliyor", icon: CloudDrizzle };
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return { key: "cold", condition: "Snowy", conditionTr: "Karlı", icon: CloudSnow };
+  if ([45, 48].includes(code)) return { key: "cloudy", condition: "Foggy", conditionTr: "Sisli", icon: CloudFog };
+  if (temp <= 5) return { key: "cold", condition: "Cold", conditionTr: "Soğuk", icon: Snowflake };
+  if (temp >= 28) return { key: "hot", condition: "Hot", conditionTr: "Sıcak", icon: Flame };
+  if ([0, 1].includes(code)) return { key: "sunny", condition: "Sunny", conditionTr: "Güneşli", icon: Sun };
+  return { key: "cloudy", condition: "Cloudy", conditionTr: "Bulutlu", icon: Cloud };
+};
+
+type WeatherStatus = "idle" | "prompting" | "loading" | "ready" | "denied" | "error";
 
 export const SuggestPanel = ({ onResult }: Props) => {
   const { t, lang } = useLang();
   const { wardrobe, setOutfit, outfit } = useWardrobe();
   const [purpose, setPurpose] = useState<Purpose>("casual");
-  const [weather, setWeather] = useState<Weather>("cloudy");
-  const [temp, setTemp] = useState<number | undefined>(undefined);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [weatherStatus, setWeatherStatus] = useState<WeatherStatus>("idle");
   const [loading, setLoading] = useState(false);
-  const [locating, setLocating] = useState(false);
-  const [city, setCity] = useState<string>("");
+
+  const requestWeather = () => {
+    if (!navigator.geolocation) {
+      setWeatherStatus("error");
+      toast.error(lang === "tr" ? "Tarayıcı konum desteklemiyor" : "Geolocation not supported");
+      return;
+    }
+    setWeatherStatus("loading");
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        try {
+          const [wxRes, geoRes] = await Promise.all([
+            fetch(
+              `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current=temperature_2m,weather_code`,
+            ),
+            fetch(
+              `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${coords.latitude}&longitude=${coords.longitude}&language=${lang}`,
+            ).catch(() => null),
+          ]);
+          const wx = await wxRes.json();
+          const t2 = wx?.current?.temperature_2m;
+          const code = wx?.current?.weather_code;
+          if (typeof t2 !== "number" || typeof code !== "number") throw new Error("invalid weather");
+          const { key, condition, conditionTr, icon } = weatherFromCode(code, t2);
+          let city = "";
+          try {
+            const gd = geoRes ? await geoRes.json() : null;
+            city = gd?.results?.[0]?.name ?? "";
+          } catch { /* ignore */ }
+          setWeather({ key, temp: t2, city, condition, conditionTr, icon });
+          setWeatherStatus("ready");
+        } catch (e) {
+          console.error(e);
+          setWeatherStatus("error");
+        }
+      },
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) setWeatherStatus("denied");
+        else setWeatherStatus("error");
+      },
+      { timeout: 10000, enableHighAccuracy: false },
+    );
+  };
+
+  // Auto-request once when panel mounts
+  useEffect(() => {
+    if (weatherStatus === "idle") requestWeather();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const purposes: { key: Purpose; icon: typeof Briefcase; gradient: string }[] = [
     { key: "work", icon: Briefcase, gradient: "bg-gradient-lavender" },
@@ -40,58 +105,6 @@ export const SuggestPanel = ({ onResult }: Props) => {
     { key: "travel", icon: Plane, gradient: "bg-gradient-mint" },
   ];
 
-  const weathers: { key: Weather; icon: typeof Sun; defaultTemp: string }[] = [
-    { key: "sunny", icon: Sun, defaultTemp: "26°" },
-    { key: "cloudy", icon: Cloud, defaultTemp: "19°" },
-    { key: "rainy", icon: CloudRain, defaultTemp: "14°" },
-    { key: "cold", icon: Snowflake, defaultTemp: "4°" },
-    { key: "hot", icon: Flame, defaultTemp: "32°" },
-  ];
-
-  const detectLocation = () => {
-    if (!navigator.geolocation) {
-      toast.error(lang === "tr" ? "Tarayıcı konum desteklemiyor" : "Geolocation not supported");
-      return;
-    }
-    setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      async ({ coords }) => {
-        try {
-          const res = await fetch(
-            `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current=temperature_2m,weather_code`,
-          );
-          const data = await res.json();
-          const t2 = data?.current?.temperature_2m;
-          const code = data?.current?.weather_code;
-          if (typeof t2 === "number" && typeof code === "number") {
-            const { key } = weatherCodeToKey(code, t2);
-            setWeather(key);
-            setTemp(t2);
-            // Reverse geocode (best-effort)
-            try {
-              const geo = await fetch(
-                `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${coords.latitude}&longitude=${coords.longitude}&language=${lang}`,
-              );
-              const gd = await geo.json();
-              const name = gd?.results?.[0]?.name;
-              if (name) setCity(name);
-            } catch { /* ignore */ }
-            toast.success(lang === "tr" ? `Hava güncellendi: ${Math.round(t2)}°` : `Weather updated: ${Math.round(t2)}°`);
-          }
-        } catch (e) {
-          toast.error(lang === "tr" ? "Hava bilgisi alınamadı" : "Couldn't fetch weather");
-        } finally {
-          setLocating(false);
-        }
-      },
-      () => {
-        setLocating(false);
-        toast.error(lang === "tr" ? "Konum izni reddedildi" : "Location permission denied");
-      },
-      { timeout: 10000 },
-    );
-  };
-
   const handleGenerate = async () => {
     if (wardrobe.length < 2) {
       toast.error(lang === "tr" ? "Önce dolabını yükle" : "Upload your wardrobe first");
@@ -99,13 +112,15 @@ export const SuggestPanel = ({ onResult }: Props) => {
     }
     setLoading(true);
     try {
-      // Pass a stripped wardrobe to AI to keep payload small
       const compact = wardrobe.map((w) => ({
         id: w.id,
         category: w.category,
         type: w.type_en,
         color: w.color_en,
-        texture: w.texture_en,
+        material: w.material_en,
+        pattern: w.pattern_en,
+        fit: w.fit_en,
+        style: w.style_en,
         weight: w.weight,
         season: w.season_en,
       }));
@@ -116,8 +131,8 @@ export const SuggestPanel = ({ onResult }: Props) => {
         body: {
           wardrobe: compact,
           purpose,
-          weather,
-          temperature: temp,
+          weather: weather?.key ?? "cloudy",
+          temperature: weather?.temp,
           lang,
           avoidIds,
         },
@@ -163,6 +178,15 @@ export const SuggestPanel = ({ onResult }: Props) => {
         </div>
 
         <div className="space-y-8 rounded-3xl border border-border bg-card p-6 shadow-card md:p-10">
+          {/* Weather card */}
+          <WeatherCard
+            status={weatherStatus}
+            weather={weather}
+            lang={lang}
+            t={t}
+            onRetry={requestWeather}
+          />
+
           {/* Purpose */}
           <div>
             <h3 className="mb-4 font-display text-xl font-bold">{t.suggest.purpose}</h3>
@@ -189,55 +213,9 @@ export const SuggestPanel = ({ onResult }: Props) => {
             </div>
           </div>
 
-          {/* Weather */}
-          <div>
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <h3 className="font-display text-xl font-bold">{t.suggest.weather}</h3>
-              <Button
-                onClick={detectLocation}
-                disabled={locating}
-                size="sm"
-                variant="outline"
-                className="rounded-full"
-              >
-                {locating ? (
-                  <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-                ) : (
-                  <MapPin className="mr-1.5 h-4 w-4" />
-                )}
-                {lang === "tr" ? "Konumumdan al" : "Use my location"}
-                {city && <span className="ml-1.5 text-muted-foreground">· {city}</span>}
-              </Button>
-            </div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-              {weathers.map(({ key, icon: Icon, defaultTemp }) => {
-                const active = weather === key;
-                const showTemp = active && temp !== undefined ? `${Math.round(temp)}°` : defaultTemp;
-                return (
-                  <button
-                    key={key}
-                    onClick={() => {
-                      setWeather(key);
-                      setTemp(undefined);
-                    }}
-                    className={`flex flex-col items-center gap-1.5 rounded-2xl border-2 p-4 transition-bounce ${
-                      active
-                        ? "border-primary bg-primary/5 shadow-pop -translate-y-0.5"
-                        : "border-border bg-muted/30 hover:border-primary/40 hover:-translate-y-0.5"
-                    }`}
-                  >
-                    <Icon className={`h-6 w-6 ${active ? "text-primary" : "text-muted-foreground"}`} />
-                    <div className="text-xs font-semibold">{t.weather[key]}</div>
-                    <div className="text-xs text-muted-foreground">{showTemp}</div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
           <Button
             onClick={handleGenerate}
-            disabled={loading}
+            disabled={loading || weatherStatus === "loading"}
             size="lg"
             className="h-14 w-full rounded-full bg-gradient-coral text-base font-semibold shadow-glow transition-bounce hover:scale-[1.01] hover:shadow-pop"
           >
@@ -256,5 +234,97 @@ export const SuggestPanel = ({ onResult }: Props) => {
         </div>
       </div>
     </section>
+  );
+};
+
+const WeatherCard = ({
+  status,
+  weather,
+  lang,
+  t,
+  onRetry,
+}: {
+  status: WeatherStatus;
+  weather: WeatherData | null;
+  lang: "tr" | "en";
+  t: ReturnType<typeof useLang>["t"];
+  onRetry: () => void;
+}) => {
+  if (status === "ready" && weather) {
+    const Icon = weather.icon;
+    const condition = lang === "tr" ? weather.conditionTr : weather.condition;
+    return (
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-hero p-6 text-primary-foreground shadow-pop">
+        <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+        <div className="relative flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
+              <Icon className="h-9 w-9" />
+            </div>
+            <div>
+              <div className="text-4xl font-display font-bold leading-none">
+                {Math.round(weather.temp)}°
+              </div>
+              <div className="mt-1 text-sm font-medium opacity-90">{condition}</div>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="flex items-center gap-1.5 justify-end text-sm font-medium opacity-90">
+              <MapPin className="h-3.5 w-3.5" />
+              <span>{weather.city || (lang === "tr" ? "Konumun" : "Your location")}</span>
+            </div>
+            <button
+              onClick={onRetry}
+              className="mt-2 text-xs underline-offset-2 hover:underline opacity-80 hover:opacity-100"
+            >
+              {lang === "tr" ? "Yenile" : "Refresh"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "loading" || status === "idle") {
+    return (
+      <div className="flex items-center gap-3 rounded-2xl border border-dashed border-border bg-muted/30 p-6">
+        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+        <span className="text-sm font-medium text-muted-foreground">{t.suggest.weatherLoading}</span>
+      </div>
+    );
+  }
+
+  if (status === "denied") {
+    return (
+      <div className="rounded-2xl border-2 border-dashed border-destructive/40 bg-destructive/5 p-6">
+        <div className="flex items-start gap-3">
+          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
+          <div className="flex-1">
+            <div className="font-semibold text-foreground">{t.suggest.weatherDenied}</div>
+            <p className="mt-1 text-sm text-muted-foreground">{t.suggest.weatherAllowDesc}</p>
+            <Button onClick={onRetry} variant="outline" size="sm" className="mt-3 rounded-full">
+              <MapPin className="mr-1.5 h-4 w-4" />
+              {t.suggest.weatherRetry}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // error
+  return (
+    <div className="rounded-2xl border-2 border-dashed border-border bg-muted/30 p-6">
+      <div className="flex items-start gap-3">
+        <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+        <div className="flex-1">
+          <div className="font-semibold text-foreground">{t.suggest.weatherError}</div>
+          <Button onClick={onRetry} variant="outline" size="sm" className="mt-3 rounded-full">
+            <MapPin className="mr-1.5 h-4 w-4" />
+            {t.suggest.weatherRetry}
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };

@@ -8,11 +8,25 @@ export type WardrobeItem = {
   color_en: string;
   color_tr: string;
   color_hex: string;
-  texture_en: string;
-  texture_tr: string;
+  // Legacy texture fields (kept optional for backward compatibility)
+  texture_en?: string;
+  texture_tr?: string;
+  // Detailed analysis
+  material_en: string;
+  material_tr: string;
+  pattern_en: string;
+  pattern_tr: string;
+  fit_en: string;
+  fit_tr: string;
+  style_en: string;
+  style_tr: string;
+  details_en: string;
+  details_tr: string;
+  brand_guess: string;
   weight: "light" | "medium" | "heavy";
   season_en: string;
   season_tr: string;
+  confidence: number;
   emoji: string;
 };
 
