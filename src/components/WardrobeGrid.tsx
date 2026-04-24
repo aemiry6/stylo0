@@ -1,13 +1,18 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageProvider";
-import { ArrowRight, BadgeCheck } from "lucide-react";
+import { ArrowRight, BadgeCheck, AlertTriangle, Pencil } from "lucide-react";
 import { useWardrobe, type WardrobeItem } from "@/state/WardrobeContext";
+import { ItemEditDialog } from "./ItemEditDialog";
 
 type Props = { onNext: () => void };
+
+const LOW_CONFIDENCE = 0.7;
 
 export const WardrobeGrid = ({ onNext }: Props) => {
   const { t, lang } = useLang();
   const { wardrobe } = useWardrobe();
+  const [editing, setEditing] = useState<WardrobeItem | null>(null);
 
   if (wardrobe.length === 0) return null;
 
@@ -22,7 +27,14 @@ export const WardrobeGrid = ({ onNext }: Props) => {
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {wardrobe.map((it, i) => (
-          <ItemCard key={it.id} item={it} index={i} lang={lang} t={t} />
+          <ItemCard
+            key={it.id}
+            item={it}
+            index={i}
+            lang={lang}
+            t={t}
+            onClick={() => setEditing(it)}
+          />
         ))}
       </div>
 
@@ -36,6 +48,12 @@ export const WardrobeGrid = ({ onNext }: Props) => {
           <ArrowRight className="ml-1 h-5 w-5 transition-smooth group-hover:translate-x-1" />
         </Button>
       </div>
+
+      <ItemEditDialog
+        item={editing}
+        open={!!editing}
+        onOpenChange={(o) => !o && setEditing(null)}
+      />
     </section>
   );
 };
@@ -45,11 +63,13 @@ const ItemCard = ({
   index,
   lang,
   t,
+  onClick,
 }: {
   item: WardrobeItem;
   index: number;
   lang: "tr" | "en";
   t: ReturnType<typeof useLang>["t"];
+  onClick: () => void;
 }) => {
   const tags = t.wardrobe.tags;
   const material = lang === "tr" ? it.material_tr : it.material_en;
@@ -60,12 +80,22 @@ const ItemCard = ({
   const season = lang === "tr" ? it.season_tr : it.season_en;
   const hasBrand = it.brand_guess && it.brand_guess.toLowerCase() !== "unknown" && it.brand_guess !== "Bilinmiyor";
   const conf = Math.round((it.confidence ?? 0.8) * 100);
+  const isLow = (it.confidence ?? 0.8) < LOW_CONFIDENCE;
 
   return (
-    <div
-      className="group rounded-3xl border border-border bg-card p-5 shadow-card transition-bounce hover:-translate-y-1 hover:shadow-pop animate-fade-in"
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group relative w-full text-left rounded-3xl border bg-card p-5 shadow-card transition-bounce hover:-translate-y-1 hover:shadow-pop animate-fade-in focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+        isLow ? "border-destructive/40 ring-1 ring-destructive/30" : "border-border"
+      }`}
       style={{ animationDelay: `${index * 60}ms` }}
+      aria-label={`${lang === "tr" ? it.type_tr : it.type_en} — ${t.wardrobe.edit.title}`}
     >
+      <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground opacity-0 shadow-soft transition-smooth group-hover:opacity-100">
+        <Pencil className="h-3.5 w-3.5" />
+      </span>
+
       <div className="mb-4 flex items-start gap-4">
         <div
           className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-3xl shadow-soft"
@@ -73,7 +103,7 @@ const ItemCard = ({
         >
           <span className="drop-shadow">{it.emoji}</span>
         </div>
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 pr-8">
           <div className="font-display text-lg font-bold leading-tight truncate">
             {lang === "tr" ? it.type_tr : it.type_en}
           </div>
@@ -81,12 +111,32 @@ const ItemCard = ({
             {lang === "tr" ? it.color_tr : it.color_en}
             {hasBrand && <> · <span className="font-semibold text-foreground">{it.brand_guess}</span></>}
           </div>
-          <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
-            <BadgeCheck className="h-3 w-3 text-primary" />
-            <span>{t.wardrobe.confidence}: {conf}%</span>
+          <div className="mt-1.5 flex items-center gap-1.5 text-[11px]">
+            {isLow ? (
+              <>
+                <AlertTriangle className="h-3 w-3 text-destructive" />
+                <span className="font-semibold text-destructive">{conf}%</span>
+                <span className="text-muted-foreground">· {t.wardrobe.confidence}</span>
+              </>
+            ) : (
+              <>
+                <BadgeCheck className="h-3 w-3 text-primary" />
+                <span className="text-muted-foreground">{t.wardrobe.confidence}: {conf}%</span>
+              </>
+            )}
           </div>
         </div>
       </div>
+
+      {isLow && (
+        <div className="mb-3 flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 p-2.5 text-xs">
+          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-destructive" />
+          <div>
+            <div className="font-semibold text-destructive">{t.wardrobe.lowConfidence}</div>
+            <div className="mt-0.5 text-muted-foreground">{t.wardrobe.lowConfidenceHint}</div>
+          </div>
+        </div>
+      )}
 
       {details && (
         <p className="mb-3 line-clamp-2 text-xs text-muted-foreground">
@@ -102,7 +152,7 @@ const ItemCard = ({
         <Tag label={tags.weight} value={weightLabel(it.weight, lang)} />
         <Tag label={tags.season} value={season} />
       </div>
-    </div>
+    </button>
   );
 };
 

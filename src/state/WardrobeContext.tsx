@@ -40,6 +40,9 @@ export type Outfit = {
 type Ctx = {
   wardrobe: WardrobeItem[];
   setWardrobe: (items: WardrobeItem[]) => void;
+  removeItem: (id: string) => void;
+  replaceItem: (id: string, next: Omit<WardrobeItem, "id">) => void;
+  addItems: (items: Omit<WardrobeItem, "id">[]) => void;
   outfit: Outfit | null;
   setOutfit: (o: Outfit | null) => void;
   resetAll: () => void;
@@ -52,9 +55,23 @@ export const WardrobeProvider = ({ children }: { children: ReactNode }) => {
   const [outfit, setOutfit] = useState<Outfit | null>(null);
 
   const setWardrobe = useCallback((items: WardrobeItem[]) => {
-    // Assign stable IDs if missing
     const withIds = items.map((it, i) => ({ ...it, id: it.id || `w-${Date.now()}-${i}` }));
     setWardrobeState(withIds);
+  }, []);
+
+  const removeItem = useCallback((id: string) => {
+    setWardrobeState((prev) => prev.filter((it) => it.id !== id));
+  }, []);
+
+  const replaceItem = useCallback((id: string, next: Omit<WardrobeItem, "id">) => {
+    setWardrobeState((prev) => prev.map((it) => (it.id === id ? { ...next, id } : it)));
+  }, []);
+
+  const addItems = useCallback((items: Omit<WardrobeItem, "id">[]) => {
+    setWardrobeState((prev) => [
+      ...prev,
+      ...items.map((it, i) => ({ ...it, id: `w-${Date.now()}-${prev.length + i}` })),
+    ]);
   }, []);
 
   const resetAll = useCallback(() => {
@@ -63,7 +80,9 @@ export const WardrobeProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <WardrobeContext.Provider value={{ wardrobe, setWardrobe, outfit, setOutfit, resetAll }}>
+    <WardrobeContext.Provider
+      value={{ wardrobe, setWardrobe, removeItem, replaceItem, addItems, outfit, setOutfit, resetAll }}
+    >
       {children}
     </WardrobeContext.Provider>
   );
