@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState, ReactNode, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/state/AuthContext";
+import type { Json } from "@/integrations/supabase/types";
 
 export type WardrobeItem = {
   id: string;
@@ -60,7 +61,7 @@ const syncWardrobe = async (userId: string, items: WardrobeItem[]) => {
   await supabase.from("wardrobe_items").insert(
     items.map((item, index) => ({
       user_id: userId,
-      item_data: item as unknown as Record<string, unknown>,
+      item_data: item as unknown as Json,
       sort_order: index,
     })),
   );
