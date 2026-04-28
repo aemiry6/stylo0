@@ -4,6 +4,7 @@ import { useLang } from "@/i18n/LanguageProvider";
 import { ArrowRight, BadgeCheck, AlertTriangle, Pencil } from "lucide-react";
 import { useWardrobe, type WardrobeItem } from "@/state/WardrobeContext";
 import { ItemEditDialog } from "./ItemEditDialog";
+import { UploadSection } from "./UploadSection";
 
 type Props = { onNext: () => void };
 
@@ -13,6 +14,7 @@ export const WardrobeGrid = ({ onNext }: Props) => {
   const { t, lang } = useLang();
   const { wardrobe } = useWardrobe();
   const [editing, setEditing] = useState<WardrobeItem | null>(null);
+  const [adding, setAdding] = useState(false);
 
   if (wardrobe.length === 0) return null;
 
@@ -36,6 +38,23 @@ export const WardrobeGrid = ({ onNext }: Props) => {
             onClick={() => setEditing(it)}
           />
         ))}
+      </div>
+
+      <div className="mt-8 rounded-3xl border border-border bg-card p-5 shadow-card md:p-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h3 className="font-display text-2xl font-bold">{t.wardrobe.addMoreTitle}</h3>
+            <p className="mt-1 text-sm text-muted-foreground">{t.wardrobe.addMoreSubtitle}</p>
+          </div>
+          <Button onClick={() => setAdding((v) => !v)} variant="outline" className="rounded-full font-semibold">
+            {t.wardrobe.addMoreCta}
+          </Button>
+        </div>
+        {adding && (
+          <div className="mt-5 animate-fade-in">
+            <UploadSection append compact onAnalyzed={() => setAdding(false)} />
+          </div>
+        )}
       </div>
 
       <div className="mt-10 flex justify-center">
