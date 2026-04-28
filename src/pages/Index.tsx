@@ -8,11 +8,12 @@ import { WardrobeGrid } from "@/components/WardrobeGrid";
 import { SuggestPanel } from "@/components/SuggestPanel";
 import { OutfitResult } from "@/components/OutfitResult";
 import { SiteFooter } from "@/components/SiteFooter";
-import { WardrobeProvider } from "@/state/WardrobeContext";
+import { WardrobeProvider, useWardrobe } from "@/state/WardrobeContext";
 
 type Stage = "intro" | "wardrobe" | "suggest" | "result";
 
 const StyloApp = () => {
+  const { wardrobe } = useWardrobe();
   const [stage, setStage] = useState<Stage>("intro");
   const wardrobeRef = useRef<HTMLDivElement>(null);
   const suggestRef = useRef<HTMLDivElement>(null);
@@ -27,6 +28,10 @@ const StyloApp = () => {
     if (stage === "suggest") setTimeout(() => scrollTo(suggestRef.current), 100);
     if (stage === "result") setTimeout(() => scrollTo(resultRef.current), 100);
   }, [stage]);
+
+  useEffect(() => {
+    if (wardrobe.length > 0 && stage === "intro") setStage("wardrobe");
+  }, [wardrobe.length, stage]);
 
   return (
     <div className="min-h-screen bg-background">
