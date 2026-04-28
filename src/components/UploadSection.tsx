@@ -8,6 +8,8 @@ import { toast } from "sonner";
 
 type Props = {
   onAnalyzed: () => void;
+  append?: boolean;
+  compact?: boolean;
 };
 
 const fileToDataUrl = (file: File) =>
@@ -44,9 +46,9 @@ const compress = async (file: File): Promise<string> => {
   });
 };
 
-export const UploadSection = ({ onAnalyzed }: Props) => {
+export const UploadSection = ({ onAnalyzed, append = false, compact = false }: Props) => {
   const { t } = useLang();
-  const { setWardrobe } = useWardrobe();
+  const { setWardrobe, addItems } = useWardrobe();
   const [mode, setMode] = useState<"photo" | "video">("photo");
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
@@ -101,7 +103,8 @@ export const UploadSection = ({ onAnalyzed }: Props) => {
         setAnalyzing(false);
         return;
       }
-      setWardrobe(items);
+      if (append) addItems(items);
+      else setWardrobe(items);
       onAnalyzed();
     } catch (e) {
       console.error(e);
@@ -112,14 +115,16 @@ export const UploadSection = ({ onAnalyzed }: Props) => {
   };
 
   return (
-    <section id="upload" className="container py-20 md:py-24">
+    <section id="upload" className={compact ? "py-0" : "container py-20 md:py-24"}>
       <div className="mx-auto max-w-3xl">
-        <div className="mb-8 text-center">
-          <h2 className="font-display text-4xl font-bold tracking-tight md:text-5xl">{t.upload.title}</h2>
-          <p className="mt-3 text-lg text-muted-foreground">{t.upload.subtitle}</p>
-        </div>
+        {!compact && (
+          <div className="mb-8 text-center">
+            <h2 className="font-display text-4xl font-bold tracking-tight md:text-5xl">{t.upload.title}</h2>
+            <p className="mt-3 text-lg text-muted-foreground">{t.upload.subtitle}</p>
+          </div>
+        )}
 
-        <div className="rounded-3xl border border-border bg-card p-6 shadow-card md:p-8">
+        <div className={compact ? "rounded-2xl border border-border bg-muted/30 p-4" : "rounded-3xl border border-border bg-card p-6 shadow-card md:p-8"}>
           {/* Mode switcher */}
           <div className="mb-6 inline-flex rounded-full bg-muted p-1">
             <button
