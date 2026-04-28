@@ -27,7 +27,7 @@ const Auth = () => {
     if (!authLoading && user) navigate("/app", { replace: true });
   }, [authLoading, navigate, user]);
 
-  const copy = lang === "tr" ? t.auth : translationsFallback.tr.auth;
+  const copy = t.auth;
 
   const handleEmail = async (e: FormEvent) => {
     e.preventDefault();
@@ -126,27 +126,6 @@ const Auth = () => {
       </main>
     </div>
   );
-};
-
-const translationsFallback = {
-  tr: {
-    auth: {
-      signinTitle: "Giriş yap",
-      signupTitle: "Profil oluştur",
-      subtitle: "Dolabını güvenle kaydet ve her gün aynı parçaları gör.",
-      google: "Google ile devam et",
-      or: "veya",
-      name: "Adın",
-      email: "E-posta",
-      password: "Şifre",
-      signin: "Giriş yap",
-      signup: "Profil oluştur",
-      toSignup: "Hesabın yok mu? Profil oluştur",
-      toSignin: "Zaten hesabın var mı? Giriş yap",
-      signupSuccess: "Profil oluşturuldu. E-postanı doğruladıktan sonra giriş yapabilirsin.",
-      error: "Giriş işlemi tamamlanamadı",
-    },
-  },
 };
 
 export default Auth;
