@@ -105,6 +105,7 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
       }
       if (append) addItems(items);
       else setWardrobe(items);
+      window.localStorage.removeItem("stylo-new-user");
       onAnalyzed();
     } catch (e) {
       console.error(e);
