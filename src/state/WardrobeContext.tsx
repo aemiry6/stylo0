@@ -1,4 +1,6 @@
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useEffect, useRef, useState, ReactNode, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/state/AuthContext";
 
 export type WardrobeItem = {
   id: string;
@@ -39,6 +41,7 @@ export type Outfit = {
 
 type Ctx = {
   wardrobe: WardrobeItem[];
+  loading: boolean;
   setWardrobe: (items: WardrobeItem[]) => void;
   removeItem: (id: string) => void;
   replaceItem: (id: string, next: Omit<WardrobeItem, "id">) => void;
@@ -52,6 +55,9 @@ const WardrobeContext = createContext<Ctx | null>(null);
 const STORAGE_KEY = "stylo-wardrobe-v1";
 
 export const WardrobeProvider = ({ children }: { children: ReactNode }) => {
+  const { user, loading: authLoading } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const loadedUserRef = useRef<string | null>(null);
   const [wardrobe, setWardrobeState] = useState<WardrobeItem[]>(() => {
     if (typeof window === "undefined") return [];
     try {
@@ -65,6 +71,43 @@ export const WardrobeProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(wardrobe));
   }, [wardrobe]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) {
+      loadedUserRef.current = null;
+      setLoading(false);
+      return;
+    }
+    if (loadedUserRef.current === user.id) return;
+
+    let cancelled = false;
+    setLoading(true);
+    supabase
+      .from("wardrobe_items")
+      .select("item_data,sort_order")
+      .eq("user_id", user.id)
+      .order("sort_order", { ascending: true })
+      .then(async ({ data, error }) => {
+        if (cancelled) return;
+        if (!error && data && data.length > 0) {
+          setWardrobeState(data.map((row) => row.item_data as unknown as WardrobeItem));
+        } else if (wardrobe.length > 0) {
+          await syncWardrobe(user.id, wardrobe);
+        }
+        loadedUserRef.current = user.id;
+        setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, user, wardrobe]);
+
+  useEffect(() => {
+    if (!user || loadedUserRef.current !== user.id) return;
+    void syncWardrobe(user.id, wardrobe);
+  }, [user, wardrobe]);
 
   const setWardrobe = useCallback((items: WardrobeItem[]) => {
     const withIds = items.map((it, i) => ({ ...it, id: it.id || `w-${Date.now()}-${i}` }));
