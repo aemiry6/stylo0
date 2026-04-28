@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 
 export type WardrobeItem = {
   id: string;
@@ -49,10 +49,22 @@ type Ctx = {
 };
 
 const WardrobeContext = createContext<Ctx | null>(null);
+const STORAGE_KEY = "stylo-wardrobe-v1";
 
 export const WardrobeProvider = ({ children }: { children: ReactNode }) => {
-  const [wardrobe, setWardrobeState] = useState<WardrobeItem[]>([]);
+  const [wardrobe, setWardrobeState] = useState<WardrobeItem[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      return JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "[]");
+    } catch {
+      return [];
+    }
+  });
   const [outfit, setOutfit] = useState<Outfit | null>(null);
+
+  useEffect(() => {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(wardrobe));
+  }, [wardrobe]);
 
   const setWardrobe = useCallback((items: WardrobeItem[]) => {
     const withIds = items.map((it, i) => ({ ...it, id: it.id || `w-${Date.now()}-${i}` }));
@@ -77,6 +89,7 @@ export const WardrobeProvider = ({ children }: { children: ReactNode }) => {
   const resetAll = useCallback(() => {
     setWardrobeState([]);
     setOutfit(null);
+    window.localStorage.removeItem(STORAGE_KEY);
   }, []);
 
   return (
