@@ -248,12 +248,16 @@ const WeatherCard = ({
   lang,
   t,
   onRetry,
+  manualWeather,
+  onManualWeatherChange,
 }: {
   status: WeatherStatus;
   weather: WeatherData | null;
   lang: "tr" | "en";
   t: ReturnType<typeof useLang>["t"];
   onRetry: () => void;
+  manualWeather: string;
+  onManualWeatherChange: (value: string) => void;
 }) => {
   if (status === "ready" && weather) {
     const Icon = weather.icon;
@@ -307,6 +311,12 @@ const WeatherCard = ({
           <div className="flex-1">
             <div className="font-semibold text-foreground">{t.suggest.weatherDenied}</div>
             <p className="mt-1 text-sm text-muted-foreground">{t.suggest.weatherAllowDesc}</p>
+            <Textarea
+              value={manualWeather}
+              onChange={(e) => onManualWeatherChange(e.target.value)}
+              placeholder={t.suggest.weatherManualPlaceholder}
+              className="mt-4 min-h-24 rounded-2xl bg-background"
+            />
             <Button onClick={onRetry} variant="outline" size="sm" className="mt-3 rounded-full">
               <MapPin className="mr-1.5 h-4 w-4" />
               {t.suggest.weatherRetry}
