@@ -54,6 +54,18 @@ type Ctx = {
 const WardrobeContext = createContext<Ctx | null>(null);
 const STORAGE_KEY = "stylo-wardrobe-v1";
 
+const syncWardrobe = async (userId: string, items: WardrobeItem[]) => {
+  await supabase.from("wardrobe_items").delete().eq("user_id", userId);
+  if (items.length === 0) return;
+  await supabase.from("wardrobe_items").insert(
+    items.map((item, index) => ({
+      user_id: userId,
+      item_data: item as unknown as Record<string, unknown>,
+      sort_order: index,
+    })),
+  );
+};
+
 export const WardrobeProvider = ({ children }: { children: ReactNode }) => {
   const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -137,7 +149,7 @@ export const WardrobeProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <WardrobeContext.Provider
-      value={{ wardrobe, setWardrobe, removeItem, replaceItem, addItems, outfit, setOutfit, resetAll }}
+      value={{ wardrobe, loading, setWardrobe, removeItem, replaceItem, addItems, outfit, setOutfit, resetAll }}
     >
       {children}
     </WardrobeContext.Provider>
