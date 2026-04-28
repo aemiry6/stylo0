@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { LanguageProvider } from "@/i18n/LanguageProvider";
+import { Navigate } from "react-router-dom";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Hero } from "@/components/Hero";
 import { Steps } from "@/components/Steps";
@@ -8,17 +8,23 @@ import { WardrobeGrid } from "@/components/WardrobeGrid";
 import { SuggestPanel } from "@/components/SuggestPanel";
 import { OutfitResult } from "@/components/OutfitResult";
 import { SiteFooter } from "@/components/SiteFooter";
-import { WardrobeProvider, useWardrobe } from "@/state/WardrobeContext";
+import { useWardrobe } from "@/state/WardrobeContext";
+import { useAuth } from "@/state/AuthContext";
 
 type Stage = "intro" | "wardrobe" | "suggest" | "result";
 
 const StyloApp = () => {
   const { wardrobe } = useWardrobe();
+  const { user, loading } = useAuth();
   const [stage, setStage] = useState<Stage>("intro");
   const wardrobeRef = useRef<HTMLDivElement>(null);
   const suggestRef = useRef<HTMLDivElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
   const uploadRef = useRef<HTMLDivElement>(null);
+
+  if (!loading && user && localStorage.getItem("stylo-new-user") !== "1") {
+    return <Navigate to="/app" replace />;
+  }
 
   const scrollTo = (el: HTMLElement | null) =>
     el && el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -81,12 +87,6 @@ const StyloApp = () => {
   );
 };
 
-const Index = () => (
-  <LanguageProvider>
-    <WardrobeProvider>
-      <StyloApp />
-    </WardrobeProvider>
-  </LanguageProvider>
-);
+const Index = () => <StyloApp />;
 
 export default Index;
