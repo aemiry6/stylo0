@@ -5,6 +5,7 @@ import {
   Loader2, Sparkles, MapPin, AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { useLang } from "@/i18n/LanguageProvider";
 import { useWardrobe } from "@/state/WardrobeContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,6 +46,7 @@ export const SuggestPanel = ({ onResult }: Props) => {
   const [purpose, setPurpose] = useState<Purpose>("casual");
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [weatherStatus, setWeatherStatus] = useState<WeatherStatus>("idle");
+  const [manualWeather, setManualWeather] = useState("");
   const [loading, setLoading] = useState(false);
 
   const requestWeather = () => {
@@ -133,6 +135,7 @@ export const SuggestPanel = ({ onResult }: Props) => {
           purpose,
           weather: weather?.key ?? "cloudy",
           temperature: weather?.temp,
+          weatherNote: manualWeather,
           lang,
           avoidIds,
         },
@@ -185,6 +188,8 @@ export const SuggestPanel = ({ onResult }: Props) => {
             lang={lang}
             t={t}
             onRetry={requestWeather}
+            manualWeather={manualWeather}
+            onManualWeatherChange={setManualWeather}
           />
 
           {/* Purpose */}
