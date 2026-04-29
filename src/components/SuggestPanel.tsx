@@ -42,7 +42,7 @@ type WeatherStatus = "idle" | "prompting" | "loading" | "ready" | "denied" | "er
 
 export const SuggestPanel = ({ onResult }: Props) => {
   const { t, lang } = useLang();
-  const { wardrobe, setOutfit, outfit } = useWardrobe();
+  const { wardrobe, setOutfit, outfit, savedOutfits } = useWardrobe();
   const [purpose, setPurpose] = useState<Purpose>("casual");
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [weatherStatus, setWeatherStatus] = useState<WeatherStatus>("idle");
@@ -127,7 +127,8 @@ export const SuggestPanel = ({ onResult }: Props) => {
         season: w.season_en,
       }));
 
-      const avoidIds = outfit?.items.map((i) => i.id) ?? [];
+      const currentIds = outfit?.items.map((i) => i.id) ?? [];
+      const savedCombinations = savedOutfits.slice(0, 12).map((saved) => saved.outfit.items.map((item) => item.id));
 
       const { data, error } = await supabase.functions.invoke("suggest-outfit", {
         body: {
@@ -137,7 +138,8 @@ export const SuggestPanel = ({ onResult }: Props) => {
           temperature: weather?.temp,
           weatherNote: manualWeather,
           lang,
-          avoidIds,
+          avoidIds: currentIds,
+          savedCombinations,
         },
       });
 
@@ -253,7 +255,7 @@ const WeatherCard = ({
 }: {
   status: WeatherStatus;
   weather: WeatherData | null;
-  lang: "tr" | "en";
+  lang: "tr" | "en" | "de" | "es";
   t: ReturnType<typeof useLang>["t"];
   onRetry: () => void;
   manualWeather: string;
