@@ -16,7 +16,7 @@ type Stage = "wardrobe" | "suggest" | "result";
 const Closet = () => {
   const { user, profile, loading } = useAuth();
   const { wardrobe, loading: wardrobeLoading } = useWardrobe();
-  const { lang } = useLang();
+  const { lang, t } = useLang();
   const navigate = useNavigate();
   const [stage, setStage] = useState<Stage>("wardrobe");
   const wardrobeRef = useRef<HTMLDivElement>(null);
@@ -44,12 +44,10 @@ const Closet = () => {
           <div className="mx-auto max-w-4xl">
             <p className="text-sm font-semibold text-primary">Stylo</p>
             <h1 className="mt-2 font-display text-4xl font-bold md:text-6xl">
-              {lang === "tr" ? `${name} kişisinin dolabı` : `${name}'s wardrobe`}
+              {lang === "tr" ? `${name} kişisinin dolabı` : lang === "de" ? `${name}s Kleiderschrank` : lang === "es" ? `Armario de ${name}` : `${name}'s wardrobe`}
             </h1>
             <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
-              {lang === "tr"
-                ? "Dolabını her zaman burada gör, yeni parça ekle, yanlışları sil ve bugünkü kombinini seç."
-                : "View your wardrobe anytime, add new pieces, remove mistakes, and choose today's outfit."}
+              {t.wardrobe.addMoreSubtitle}
             </p>
           </div>
         </section>
