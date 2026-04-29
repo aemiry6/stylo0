@@ -8,12 +8,15 @@ type Ctx = {
 };
 
 const LanguageContext = createContext<Ctx | null>(null);
+const isLang = (value: string | null): value is Lang => value === "tr" || value === "en" || value === "de" || value === "es";
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [lang, setLangState] = useState<Lang>(() => {
     if (typeof window === "undefined") return "tr";
     const saved = window.localStorage.getItem("stylo-lang") as Lang | null;
-    if (saved === "tr" || saved === "en") return saved;
+    if (isLang(saved)) return saved;
+    if (navigator.language.startsWith("de")) return "de";
+    if (navigator.language.startsWith("es")) return "es";
     return navigator.language.startsWith("tr") ? "tr" : "en";
   });
 
