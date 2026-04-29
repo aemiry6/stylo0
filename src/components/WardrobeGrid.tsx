@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageProvider";
+import type { Lang } from "@/i18n/translations";
 import { ArrowRight, BadgeCheck, AlertTriangle, Pencil } from "lucide-react";
 import { useWardrobe, type WardrobeItem } from "@/state/WardrobeContext";
 import { ItemEditDialog } from "./ItemEditDialog";
@@ -86,7 +87,7 @@ const ItemCard = ({
 }: {
   item: WardrobeItem;
   index: number;
-  lang: "tr" | "en";
+  lang: Lang;
   t: ReturnType<typeof useLang>["t"];
   onClick: () => void;
 }) => {
@@ -175,11 +176,11 @@ const ItemCard = ({
   );
 };
 
-const weightLabel = (w: "light" | "medium" | "heavy", lang: "tr" | "en") => {
+const weightLabel = (w: "light" | "medium" | "heavy", lang: Lang) => {
   const map = {
-    light: { tr: "İnce", en: "Light" },
-    medium: { tr: "Orta", en: "Medium" },
-    heavy: { tr: "Kalın", en: "Heavy" },
+    light: { tr: "İnce", en: "Light", de: "Leicht", es: "Ligera" },
+    medium: { tr: "Orta", en: "Medium", de: "Mittel", es: "Media" },
+    heavy: { tr: "Kalın", en: "Heavy", de: "Schwer", es: "Gruesa" },
   };
   return map[w][lang];
 };

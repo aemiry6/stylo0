@@ -9,6 +9,7 @@ import { WardrobeProvider } from "@/state/WardrobeContext";
 import Index from "./pages/Index.tsx";
 import Auth from "./pages/Auth.tsx";
 import Closet from "./pages/Closet.tsx";
+import SavedOutfits from "./pages/SavedOutfits.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/app" element={<Closet />} />
+                <Route path="/outfits" element={<SavedOutfits />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

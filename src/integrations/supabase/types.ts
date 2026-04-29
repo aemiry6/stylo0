@@ -44,6 +44,36 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_outfits: {
+        Row: {
+          created_at: string
+          id: string
+          note: string | null
+          outfit_data: Json
+          updated_at: string
+          user_id: string
+          worn_on: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          outfit_data: Json
+          updated_at?: string
+          user_id: string
+          worn_on?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          outfit_data?: Json
+          updated_at?: string
+          user_id?: string
+          worn_on?: string
+        }
+        Relationships: []
+      }
       wardrobe_items: {
         Row: {
           created_at: string

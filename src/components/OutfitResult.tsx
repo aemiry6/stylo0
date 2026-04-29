@@ -1,7 +1,10 @@
-import { Heart, Shuffle, RotateCcw, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Heart, Shuffle, RotateCcw, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageProvider";
 import { useWardrobe } from "@/state/WardrobeContext";
+import { useAuth } from "@/state/AuthContext";
+import { toast } from "sonner";
 
 type Props = { onRestart: () => void; onShuffle: () => void };
 
@@ -17,19 +20,33 @@ const categoryToPartKey: Record<string, "top" | "bottom" | "shoes" | "outer" | "
 
 export const OutfitResult = ({ onRestart, onShuffle }: Props) => {
   const { t, lang } = useLang();
-  const { outfit } = useWardrobe();
+  const { user } = useAuth();
+  const { outfit, saveCurrentOutfit } = useWardrobe();
+  const [saving, setSaving] = useState(false);
 
   if (!outfit) return null;
+
+  const handleSave = async () => {
+    if (!user) {
+      toast.error(t.outfit.loginToSave);
+      return;
+    }
+    setSaving(true);
+    try {
+      await saveCurrentOutfit();
+      toast.success(t.outfit.saved);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t.outfit.saveError);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <section id="result" className="container py-20 md:py-24">
       <div className="mx-auto max-w-4xl">
         <div className="mb-10 text-center">
-          <span className="inline-flex items-center gap-2 rounded-full bg-gradient-sunshine px-4 py-1.5 text-sm font-bold text-highlight-foreground shadow-soft">
-            <Sparkles className="h-4 w-4" />
-            AI Pick · {Math.round(outfit.confidence * 100)}%
-          </span>
-          <h2 className="mt-4 font-display text-4xl font-bold tracking-tight md:text-5xl">{t.outfit.title}</h2>
+          <h2 className="font-display text-4xl font-bold tracking-tight md:text-5xl">{t.outfit.title}</h2>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -78,8 +95,8 @@ export const OutfitResult = ({ onRestart, onShuffle }: Props) => {
 
         {/* Actions */}
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Button size="lg" className="h-13 rounded-full bg-gradient-coral px-7 font-semibold shadow-glow transition-bounce hover:scale-105 hover:shadow-pop">
-            <Heart className="mr-2 h-5 w-5 fill-current" />
+          <Button onClick={handleSave} disabled={saving} size="lg" className="h-13 rounded-full bg-gradient-coral px-7 font-semibold shadow-glow transition-bounce hover:scale-105 hover:shadow-pop">
+            {saving ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Heart className="mr-2 h-5 w-5 fill-current" />}
             {t.outfit.like}
           </Button>
           <Button size="lg" variant="outline" onClick={onShuffle} className="h-13 rounded-full border-2 px-7 font-semibold">

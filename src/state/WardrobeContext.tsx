@@ -40,6 +40,15 @@ export type Outfit = {
   confidence: number;
 };
 
+export type SavedOutfit = {
+  id: string;
+  user_id: string;
+  outfit: Outfit;
+  worn_on: string;
+  note: string | null;
+  created_at: string;
+};
+
 type Ctx = {
   wardrobe: WardrobeItem[];
   loading: boolean;
@@ -49,6 +58,9 @@ type Ctx = {
   addItems: (items: Omit<WardrobeItem, "id">[]) => void;
   outfit: Outfit | null;
   setOutfit: (o: Outfit | null) => void;
+  savedOutfits: SavedOutfit[];
+  saveCurrentOutfit: () => Promise<SavedOutfit | null>;
+  refreshSavedOutfits: () => Promise<void>;
   resetAll: () => void;
 };
 
@@ -80,6 +92,33 @@ export const WardrobeProvider = ({ children }: { children: ReactNode }) => {
     }
   });
   const [outfit, setOutfit] = useState<Outfit | null>(null);
+  const [savedOutfits, setSavedOutfits] = useState<SavedOutfit[]>([]);
+
+  const refreshSavedOutfits = useCallback(async () => {
+    if (!user) {
+      setSavedOutfits([]);
+      return;
+    }
+    const { data, error } = await supabase
+      .from("saved_outfits")
+      .select("id,user_id,outfit_data,worn_on,note,created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+    if (error) {
+      console.error(error);
+      return;
+    }
+    setSavedOutfits(
+      (data ?? []).map((row) => ({
+        id: row.id,
+        user_id: row.user_id,
+        outfit: row.outfit_data as unknown as Outfit,
+        worn_on: row.worn_on,
+        note: row.note,
+        created_at: row.created_at,
+      })),
+    );
+  }, [user]);
 
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(wardrobe));
@@ -89,6 +128,7 @@ export const WardrobeProvider = ({ children }: { children: ReactNode }) => {
     if (authLoading) return;
     if (!user) {
       loadedUserRef.current = null;
+      setSavedOutfits([]);
       setLoading(false);
       return;
     }
@@ -122,6 +162,30 @@ export const WardrobeProvider = ({ children }: { children: ReactNode }) => {
     void syncWardrobe(user.id, wardrobe);
   }, [user, wardrobe]);
 
+  useEffect(() => {
+    void refreshSavedOutfits();
+  }, [refreshSavedOutfits]);
+
+  const saveCurrentOutfit = useCallback(async () => {
+    if (!user || !outfit) return null;
+    const { data, error } = await supabase
+      .from("saved_outfits")
+      .insert({ user_id: user.id, outfit_data: outfit as unknown as Json })
+      .select("id,user_id,outfit_data,worn_on,note,created_at")
+      .single();
+    if (error) throw error;
+    const saved = {
+      id: data.id,
+      user_id: data.user_id,
+      outfit: data.outfit_data as unknown as Outfit,
+      worn_on: data.worn_on,
+      note: data.note,
+      created_at: data.created_at,
+    } satisfies SavedOutfit;
+    setSavedOutfits((prev) => [saved, ...prev]);
+    return saved;
+  }, [outfit, user]);
+
   const setWardrobe = useCallback((items: WardrobeItem[]) => {
     const withIds = items.map((it, i) => ({ ...it, id: it.id || `w-${Date.now()}-${i}` }));
     setWardrobeState(withIds);
@@ -150,7 +214,20 @@ export const WardrobeProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <WardrobeContext.Provider
-      value={{ wardrobe, loading, setWardrobe, removeItem, replaceItem, addItems, outfit, setOutfit, resetAll }}
+      value={{
+        wardrobe,
+        loading,
+        setWardrobe,
+        removeItem,
+        replaceItem,
+        addItems,
+        outfit,
+        setOutfit,
+        savedOutfits,
+        saveCurrentOutfit,
+        refreshSavedOutfits,
+        resetAll,
+      }}
     >
       {children}
     </WardrobeContext.Provider>
