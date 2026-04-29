@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import {
   Briefcase, Heart, Coffee, Dumbbell, PartyPopper, Plane,
   Sun, Cloud, CloudRain, Snowflake, Flame, CloudSnow, CloudDrizzle, CloudFog,
-  Loader2, Sparkles, MapPin, AlertCircle,
+  Loader2, Sparkles, MapPin, AlertCircle, GraduationCap, Camera, ShoppingBag,
+  Utensils, Home, Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,7 +12,7 @@ import { useWardrobe } from "@/state/WardrobeContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-type Purpose = "work" | "date" | "casual" | "sport" | "party" | "travel";
+type Purpose = "work" | "date" | "casual" | "sport" | "party" | "travel" | "school" | "event" | "shopping" | "dinner" | "home" | "friends";
 type Weather = "sunny" | "cloudy" | "rainy" | "cold" | "hot";
 
 type Props = { onResult: () => void };
@@ -105,6 +106,12 @@ export const SuggestPanel = ({ onResult }: Props) => {
     { key: "sport", icon: Dumbbell, gradient: "bg-gradient-mint" },
     { key: "party", icon: PartyPopper, gradient: "bg-gradient-hero" },
     { key: "travel", icon: Plane, gradient: "bg-gradient-mint" },
+    { key: "school", icon: GraduationCap, gradient: "bg-gradient-lavender" },
+    { key: "event", icon: Camera, gradient: "bg-gradient-coral" },
+    { key: "shopping", icon: ShoppingBag, gradient: "bg-gradient-sunshine" },
+    { key: "dinner", icon: Utensils, gradient: "bg-gradient-hero" },
+    { key: "home", icon: Home, gradient: "bg-gradient-mint" },
+    { key: "friends", icon: Users, gradient: "bg-gradient-lavender" },
   ];
 
   const handleGenerate = async () => {
@@ -197,7 +204,7 @@ export const SuggestPanel = ({ onResult }: Props) => {
           {/* Purpose */}
           <div>
             <h3 className="mb-4 font-display text-xl font-bold">{t.suggest.purpose}</h3>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
               {purposes.map(({ key, icon: Icon, gradient }) => {
                 const active = purpose === key;
                 return (
