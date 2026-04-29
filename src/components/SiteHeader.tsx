@@ -34,15 +34,18 @@ export const SiteHeader = ({ onCta, appMode = false }: Props) => {
           {user ? (
             <>
               {!appMode && <Link to="/app" className="hidden text-sm font-medium text-muted-foreground transition-smooth hover:text-foreground sm:inline-block">{t.nav.closet}</Link>}
+              <Link to="/outfits" className="hidden text-sm font-medium text-muted-foreground transition-smooth hover:text-foreground sm:inline-block">{t.nav.outfits}</Link>
               <Button onClick={() => void signOut()} variant="ghost" className="hidden rounded-full px-4 sm:inline-flex" size="sm">{t.nav.logout}</Button>
             </>
           ) : (
             <Link to="/auth" className="hidden text-sm font-medium text-muted-foreground transition-smooth hover:text-foreground sm:inline-block">{t.nav.login}</Link>
           )}
           <LanguageSwitcher />
-          <Button onClick={onCta} className="hidden rounded-full px-5 sm:inline-flex" size="sm">
-            {t.nav.try}
-          </Button>
+          {!user && (
+            <Button onClick={onCta} className="hidden rounded-full px-5 sm:inline-flex" size="sm">
+              {t.nav.try}
+            </Button>
+          )}
         </div>
       </div>
     </header>
