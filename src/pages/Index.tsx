@@ -22,10 +22,6 @@ const StyloApp = () => {
   const resultRef = useRef<HTMLDivElement>(null);
   const uploadRef = useRef<HTMLDivElement>(null);
 
-  if (!loading && user && localStorage.getItem("stylo-new-user") !== "1") {
-    return <Navigate to="/app" replace />;
-  }
-
   const scrollTo = (el: HTMLElement | null) =>
     el && el.scrollIntoView({ behavior: "smooth", block: "start" });
 
@@ -38,6 +34,10 @@ const StyloApp = () => {
   useEffect(() => {
     if (wardrobe.length > 0 && stage === "intro") setStage("wardrobe");
   }, [wardrobe.length, stage]);
+
+  if (!loading && user && localStorage.getItem("stylo-new-user") !== "1") {
+    return <Navigate to="/app" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
