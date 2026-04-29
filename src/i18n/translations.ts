@@ -1,12 +1,13 @@
-export type Lang = "tr" | "en";
+export type Lang = "tr" | "en" | "de" | "es";
 
-export const translations = {
+const baseTranslations = {
   tr: {
     brand: "Stylo",
     nav: {
       how: "Nasıl çalışır",
       try: "Hemen Dene",
       closet: "Dolabım",
+      outfits: "Kombinlerim",
       login: "Giriş",
       logout: "Çıkış",
     },
@@ -115,6 +116,12 @@ export const translations = {
       whyText:
         "Hafif yağmur ihtimaline karşı orta kalınlıkta bir üst seçtik, mercan tişörtün cildine sıcaklık katacak. Beyaz sneaker iş gününü rahatlatır, lavanta ceket modern bir hava verir.",
       like: "Bayıldım",
+      saved: "Kombin kaydedildi",
+      saveError: "Kombin kaydedilemedi",
+      loginToSave: "Kombini kaydetmek için giriş yap",
+      historyTitle: "Giydiklerim",
+      historySubtitle: "Kaydettiğin kombinleri burada tekrar görebilirsin.",
+      emptyHistory: "Henüz kayıtlı kombin yok.",
       shuffle: "Başka bir kombin",
       restart: "Baştan başla",
       parts: { top: "Üst", bottom: "Alt", shoes: "Ayakkabı", outer: "Dış giyim", accessory: "Aksesuar" },
@@ -125,7 +132,7 @@ export const translations = {
   },
   en: {
     brand: "Stylo",
-    nav: { how: "How it works", try: "Try it now", closet: "My closet", login: "Log in", logout: "Log out" },
+    nav: { how: "How it works", try: "Try it now", closet: "My closet", outfits: "My outfits", login: "Log in", logout: "Log out" },
     auth: {
       signinTitle: "Log in",
       signupTitle: "Create profile",
@@ -231,6 +238,12 @@ export const translations = {
       whyText:
         "We picked a mid-weight top in case of light rain — the coral tee adds warmth to your skin tone. White sneakers keep your workday easy, the lavender jacket adds a modern edge.",
       like: "Love it",
+      saved: "Outfit saved",
+      saveError: "Could not save outfit",
+      loginToSave: "Log in to save this outfit",
+      historyTitle: "Worn before",
+      historySubtitle: "See the outfits you saved before.",
+      emptyHistory: "No saved outfits yet.",
       shuffle: "Try another",
       restart: "Start over",
       parts: { top: "Top", bottom: "Bottom", shoes: "Shoes", outer: "Outer", accessory: "Accessory" },
@@ -241,4 +254,75 @@ export const translations = {
   },
 };
 
-export type Translation = (typeof translations)["tr"];
+export type Translation = (typeof baseTranslations)["tr"];
+
+export const translations: Record<Lang, Translation> = {
+  ...baseTranslations,
+  de: {
+    ...baseTranslations.en,
+    nav: { how: "So funktioniert es", try: "Jetzt testen", closet: "Mein Schrank", outfits: "Meine Outfits", login: "Einloggen", logout: "Ausloggen" },
+    auth: {
+      ...baseTranslations.en.auth,
+      signinTitle: "Einloggen",
+      signupTitle: "Profil erstellen",
+      subtitle: "Speichere deinen Kleiderschrank sicher und sieh jeden Tag dieselben Teile.",
+      google: "Mit Google fortfahren",
+      or: "oder",
+      name: "Dein Name",
+      password: "Passwort",
+      signin: "Einloggen",
+      signup: "Profil erstellen",
+      toSignup: "Noch kein Konto? Profil erstellen",
+      toSignin: "Schon ein Konto? Einloggen",
+      signupSuccess: "Profil erstellt. Nach der E-Mail-Bestätigung kannst du dich einloggen.",
+      error: "Anmeldung konnte nicht abgeschlossen werden",
+    },
+    hero: {
+      ...baseTranslations.en.hero,
+      badge: "✨ KI-gestützter persönlicher Stylist",
+      title1: "Was soll ich heute tragen?",
+      title2: "Diese Frage lösen wir für dich.",
+      cta: "Kleiderschrank hochladen",
+      ctaSecondary: "So funktioniert es",
+    },
+    upload: { ...baseTranslations.en.upload, title: "Kleiderschrank hochladen", analyze: "Analysieren", analyzing: "Stylo erkennt deinen Kleiderschrank…" },
+    wardrobe: { ...baseTranslations.en.wardrobe, title: "Dein Kleiderschrank ist bereit", next: "Outfit vorschlagen", addMoreTitle: "Fehlt etwas?", addMoreCta: "Neues Teil hinzufügen" },
+    suggest: { ...baseTranslations.en.suggest, title: "Outfit für heute", purpose: "Was steht heute an?", generate: "Outfit vorschlagen", generating: "Wir stylen deinen Look…" },
+    outfit: { ...baseTranslations.en.outfit, title: "Dein Outfit ist bereit", why: "Warum dieses Outfit?", like: "Gefällt mir", saved: "Outfit gespeichert", saveError: "Outfit konnte nicht gespeichert werden", loginToSave: "Zum Speichern bitte einloggen", historyTitle: "Schon getragen", historySubtitle: "Hier siehst du deine gespeicherten Outfits.", emptyHistory: "Noch keine gespeicherten Outfits." },
+    footer: "Stylo · Mit Liebe und KI gemacht",
+  },
+  es: {
+    ...baseTranslations.en,
+    nav: { how: "Cómo funciona", try: "Probar ahora", closet: "Mi armario", outfits: "Mis looks", login: "Entrar", logout: "Salir" },
+    auth: {
+      ...baseTranslations.en.auth,
+      signinTitle: "Entrar",
+      signupTitle: "Crear perfil",
+      subtitle: "Guarda tu armario y vuelve a ver las mismas prendas cada día.",
+      google: "Continuar con Google",
+      or: "o",
+      name: "Tu nombre",
+      email: "Correo",
+      password: "Contraseña",
+      signin: "Entrar",
+      signup: "Crear perfil",
+      toSignup: "¿No tienes cuenta? Crear perfil",
+      toSignin: "¿Ya tienes cuenta? Entrar",
+      signupSuccess: "Perfil creado. Podrás entrar después de verificar tu correo.",
+      error: "No se pudo completar el acceso",
+    },
+    hero: {
+      ...baseTranslations.en.hero,
+      badge: "✨ Estilista personal con IA",
+      title1: "¿Qué me pongo hoy?",
+      title2: "Resolvemos esa pregunta para siempre.",
+      cta: "Subir mi armario",
+      ctaSecondary: "Ver cómo funciona",
+    },
+    upload: { ...baseTranslations.en.upload, title: "Sube tu armario", analyze: "Analizar", analyzing: "Stylo está leyendo tu armario…" },
+    wardrobe: { ...baseTranslations.en.wardrobe, title: "Tu armario está listo", next: "Recibir un look", addMoreTitle: "¿Falta algo?", addMoreCta: "Añadir prenda" },
+    suggest: { ...baseTranslations.en.suggest, title: "Look de hoy", purpose: "¿Cuál es tu plan?", generate: "Crear mi look", generating: "Preparando tu estilo…" },
+    outfit: { ...baseTranslations.en.outfit, title: "Tu look está listo", why: "¿Por qué este look?", like: "Me encanta", saved: "Look guardado", saveError: "No se pudo guardar el look", loginToSave: "Entra para guardar este look", historyTitle: "Usados antes", historySubtitle: "Aquí puedes ver los looks que guardaste.", emptyHistory: "Aún no hay looks guardados." },
+    footer: "Stylo · Hecho con amor e IA",
+  },
+};
