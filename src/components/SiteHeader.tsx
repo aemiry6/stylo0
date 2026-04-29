@@ -1,4 +1,4 @@
-import { Sparkles } from "lucide-react";
+import { LogIn, Shirt, Sparkles } from "lucide-react";
 import { useLang } from "@/i18n/LanguageProvider";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Button } from "@/components/ui/button";
@@ -34,11 +34,23 @@ export const SiteHeader = ({ onCta, appMode = false }: Props) => {
           {user ? (
             <>
               {!appMode && <Link to="/app" className="hidden text-sm font-medium text-muted-foreground transition-smooth hover:text-foreground sm:inline-block">{t.nav.closet}</Link>}
-              <Link to="/outfits" className="hidden text-sm font-medium text-muted-foreground transition-smooth hover:text-foreground sm:inline-block">{t.nav.outfits}</Link>
+              <Link to="/outfits" className="text-sm font-medium text-muted-foreground transition-smooth hover:text-foreground sm:inline-block">
+                <span className="hidden sm:inline">{t.nav.outfits}</span>
+                <span className="inline-flex items-center gap-1 sm:hidden" aria-label={t.nav.outfits}>
+                  <Shirt className="h-4 w-4" />
+                  <span className="sr-only">{t.nav.outfits}</span>
+                </span>
+              </Link>
               <Button onClick={() => void signOut()} variant="ghost" className="hidden rounded-full px-4 sm:inline-flex" size="sm">{t.nav.logout}</Button>
             </>
           ) : (
-            <Link to="/auth" className="hidden text-sm font-medium text-muted-foreground transition-smooth hover:text-foreground sm:inline-block">{t.nav.login}</Link>
+            <Link to="/auth" className="text-sm font-medium text-muted-foreground transition-smooth hover:text-foreground sm:inline-block">
+              <span className="hidden sm:inline">{t.nav.login}</span>
+              <span className="inline-flex items-center gap-1 sm:hidden" aria-label={t.nav.login}>
+                <LogIn className="h-4 w-4" />
+                <span className="sr-only">{t.nav.login}</span>
+              </span>
+            </Link>
           )}
           <LanguageSwitcher />
           {!user && (
