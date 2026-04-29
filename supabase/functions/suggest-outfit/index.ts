@@ -46,7 +46,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { wardrobe, purpose, weather, temperature, weatherNote, lang, avoidIds } = await req.json();
+    const { wardrobe, purpose, weather, temperature, weatherNote, lang, avoidIds, savedCombinations } = await req.json();
     if (!Array.isArray(wardrobe) || wardrobe.length === 0) {
       return new Response(JSON.stringify({ error: "wardrobe[] required" }), {
         status: 400,
@@ -65,6 +65,7 @@ Weather: ${weather}${temperature !== undefined ? ` (${temperature}°C)` : ""}
 ${typeof weatherNote === "string" && weatherNote.trim() ? `User-described weather: ${weatherNote.trim()}` : ""}
 Preferred response language: ${lang || "tr"}
 ${Array.isArray(avoidIds) && avoidIds.length ? `Avoid repeating exactly these item ids together: ${avoidIds.join(", ")}` : ""}
+${Array.isArray(savedCombinations) && savedCombinations.length ? `Previously saved/worn outfits, do NOT repeat these exact combinations and prefer different silhouettes or colors where possible: ${JSON.stringify(savedCombinations)}` : ""}
 
 Pick the best outfit. Return only via the tool.`;
 
