@@ -1,5 +1,5 @@
 import { Navigate, useNavigate } from "react-router-dom";
-import { CalendarDays, Loader2, Shirt } from "lucide-react";
+import { CalendarDays, Loader2, Shirt, Sparkles } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,10 @@ const SavedOutfits = () => {
           <p className="text-sm font-semibold text-primary">Stylo</p>
           <h1 className="mt-2 font-display text-4xl font-bold md:text-6xl">{t.outfit.historyTitle}</h1>
           <p className="mt-3 max-w-2xl text-lg text-muted-foreground">{t.outfit.historySubtitle}</p>
+          <Button onClick={() => navigate("/app")} className="mt-6 rounded-full bg-gradient-coral font-semibold shadow-glow">
+            <Sparkles className="mr-2 h-4 w-4" />
+            {t.wardrobe.next}
+          </Button>
 
           {savedOutfits.length === 0 ? (
             <div className="mt-10 rounded-3xl border border-dashed border-border bg-card p-10 text-center shadow-card">
