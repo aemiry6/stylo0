@@ -7,15 +7,15 @@ import { useWardrobe, type WardrobeItem } from "@/state/WardrobeContext";
 import { ItemEditDialog } from "./ItemEditDialog";
 import { UploadSection } from "./UploadSection";
 
-type Props = { onNext: () => void };
+type Props = { onNext: () => void; defaultAdding?: boolean };
 
 const LOW_CONFIDENCE = 0.7;
 
-export const WardrobeGrid = ({ onNext }: Props) => {
+export const WardrobeGrid = ({ onNext, defaultAdding = false }: Props) => {
   const { t, lang } = useLang();
   const { wardrobe } = useWardrobe();
   const [editing, setEditing] = useState<WardrobeItem | null>(null);
-  const [adding, setAdding] = useState(false);
+  const [adding, setAdding] = useState(defaultAdding);
 
   if (wardrobe.length === 0) return null;
 
