@@ -192,3 +192,33 @@ const Tag = ({ label, value }: { label: string; value: string }) => (
     <span className="text-foreground">{value}</span>
   </span>
 );
+
+// Contrast-aware white/black icon to avoid weird colored emojis on every card.
+const CategoryIcon = ({ category, hex }: { category: string; hex?: string }) => {
+  const isLight = isLightColor(hex);
+  const cls = `h-7 w-7 ${isLight ? "text-black/70" : "text-white/90"}`;
+  switch (category) {
+    case "shoes":
+      return <Footprints className={cls} />;
+    case "accessory":
+      return <Watch className={cls} />;
+    case "outer":
+    case "top":
+    case "dress":
+    case "bottom":
+    case "underwear":
+    default:
+      return <Shirt className={cls} />;
+  }
+};
+
+const isLightColor = (hex?: string) => {
+  if (!hex) return false;
+  const m = hex.replace("#", "");
+  if (m.length !== 6) return false;
+  const r = parseInt(m.slice(0, 2), 16);
+  const g = parseInt(m.slice(2, 4), 16);
+  const b = parseInt(m.slice(4, 6), 16);
+  // Perceived luminance
+  return (r * 0.299 + g * 0.587 + b * 0.114) > 170;
+};
