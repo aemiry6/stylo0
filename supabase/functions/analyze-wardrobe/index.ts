@@ -157,7 +157,7 @@ serve(async (req) => {
         type: "text",
         text: `Analyze the following ${images.length} wardrobe photo(s) like Google Lens. For EVERY garment, return the full structured set of attributes (material, pattern, fit, style, details, brand if visible). Be specific and accurate.`,
       },
-      ...images.slice(0, 8).map((url: string) => ({
+      ...images.slice(0, 12).map((url: string) => ({
         type: "image_url",
         image_url: { url },
       })),
