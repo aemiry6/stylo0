@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Upload, Loader2, X, AlertTriangle } from "lucide-react";
+import { Upload, Loader2, X, AlertTriangle, Image as ImageIcon, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageProvider";
 import { useWardrobe, WardrobeItem } from "@/state/WardrobeContext";
@@ -46,9 +46,49 @@ const compress = async (file: File): Promise<string> => {
   });
 };
 
+// Capture N evenly spaced frames from a video file as JPEG data URLs.
+const extractVideoFrames = async (file: File, count = 6): Promise<string[]> => {
+  const url = URL.createObjectURL(file);
+  const video = document.createElement("video");
+  video.src = url;
+  video.muted = true;
+  video.playsInline = true;
+  video.preload = "auto";
+  await new Promise<void>((resolve, reject) => {
+    video.onloadedmetadata = () => resolve();
+    video.onerror = () => reject(new Error("video load failed"));
+  });
+  const duration = isFinite(video.duration) && video.duration > 0 ? video.duration : 0;
+  const max = 1024;
+  let { videoWidth: width, videoHeight: height } = video;
+  if (width > max || height > max) {
+    const ratio = Math.min(max / width, max / height);
+    width = Math.round(width * ratio);
+    height = Math.round(height * ratio);
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d")!;
+  const frames: string[] = [];
+  const n = duration > 0 ? count : 1;
+  for (let i = 0; i < n; i++) {
+    const t = duration > 0 ? (duration * (i + 0.5)) / n : 0;
+    await new Promise<void>((resolve) => {
+      video.onseeked = () => resolve();
+      try { video.currentTime = Math.min(t, Math.max(0, duration - 0.05)); } catch { resolve(); }
+    });
+    ctx.drawImage(video, 0, 0, width, height);
+    frames.push(canvas.toDataURL("image/jpeg", 0.82));
+  }
+  URL.revokeObjectURL(url);
+  return frames;
+};
+
 export const UploadSection = ({ onAnalyzed, append = false, compact = false }: Props) => {
   const { t } = useLang();
   const { setWardrobe, addItems } = useWardrobe();
+  const [mode, setMode] = useState<"photo" | "video">("photo");
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
@@ -58,10 +98,22 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
 
   const handleFiles = async (list: FileList | null) => {
     if (!list || list.length === 0) return;
-    const incoming = Array.from(list).filter((f) => f.type.startsWith("image/"));
-    const merged = [...files, ...incoming].slice(0, 12);
+    const want = mode === "photo" ? "image/" : "video/";
+    const incoming = Array.from(list).filter((f) => f.type.startsWith(want));
+    if (incoming.length === 0) {
+      toast.error(
+        mode === "photo"
+          ? "Lütfen fotoğraf seç / Please pick photos"
+          : "Lütfen bir video seç / Please pick a video",
+      );
+      return;
+    }
+    // For video mode keep only the most recent one
+    const merged = mode === "video" ? [incoming[0]] : [...files, ...incoming].slice(0, 12);
     setFiles(merged);
-    const newPreviews = await Promise.all(merged.map((f) => fileToDataUrl(f)));
+    const newPreviews = await Promise.all(
+      merged.map((f) => (f.type.startsWith("image/") ? fileToDataUrl(f) : Promise.resolve(URL.createObjectURL(f)))),
+    );
     setPreviews(newPreviews);
     setUnsureNotice(null);
   };
@@ -75,9 +127,24 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
     if (files.length === 0) return;
     setAnalyzing(true);
     try {
-      const images = await Promise.all(
-        files.filter((f) => f.type.startsWith("image/")).map((f) => compress(f)),
-      );
+      let images: string[] = [];
+      if (mode === "video") {
+        const videoFile = files.find((f) => f.type.startsWith("video/"));
+        if (videoFile) {
+          try {
+            images = await extractVideoFrames(videoFile, 6);
+          } catch (err) {
+            console.error(err);
+            toast.error("Video okunamadı / Could not read video");
+            setAnalyzing(false);
+            return;
+          }
+        }
+      } else {
+        images = await Promise.all(
+          files.filter((f) => f.type.startsWith("image/")).map((f) => compress(f)),
+        );
+      }
       if (images.length === 0) {
         toast.error("Lütfen en az bir fotoğraf yükle / Please upload at least one image");
         setAnalyzing(false);
@@ -135,6 +202,32 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
 
         <div className={compact ? "rounded-2xl border border-border bg-muted/30 p-4" : "rounded-3xl border border-border bg-card p-6 shadow-card md:p-8"}>
 
+          {/* Mode toggle */}
+          <div className="mb-4 inline-flex rounded-full border border-border bg-muted p-1 text-xs font-semibold">
+            <button
+              type="button"
+              onClick={() => {
+                setMode("photo");
+                setFiles([]);
+                setPreviews([]);
+              }}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-smooth ${mode === "photo" ? "bg-background shadow-soft text-foreground" : "text-muted-foreground"}`}
+            >
+              <ImageIcon className="h-3.5 w-3.5" /> {t.upload.photo}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMode("video");
+                setFiles([]);
+                setPreviews([]);
+              }}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-smooth ${mode === "video" ? "bg-background shadow-soft text-foreground" : "text-muted-foreground"}`}
+            >
+              <Video className="h-3.5 w-3.5" /> {t.upload.video}
+            </button>
+          </div>
+
           {/* Drop zone */}
           <div
             onDragOver={(e) => {
@@ -158,12 +251,12 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
               ref={inputRef}
               type="file"
               hidden
-              multiple
-              accept="image/*"
+              multiple={mode === "photo"}
+              accept={mode === "photo" ? "image/*" : "video/*"}
               onChange={(e) => handleFiles(e.target.files)}
             />
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-coral shadow-glow">
-              <Upload className="h-8 w-8 text-primary-foreground" />
+              {mode === "photo" ? <Upload className="h-8 w-8 text-primary-foreground" /> : <Video className="h-8 w-8 text-primary-foreground" />}
             </div>
             <p className="text-lg font-semibold">{t.upload.drop}</p>
             <p className="mt-1 text-sm text-muted-foreground">{t.upload.hint}</p>
@@ -171,21 +264,33 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
 
           {previews.length > 0 && (
             <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
-              {previews.map((src, i) => (
-                <div key={i} className="group relative aspect-square overflow-hidden rounded-xl border border-border">
-                  <img src={src} alt={`Preview ${i + 1}`} className="h-full w-full object-cover" />
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeFile(i);
-                    }}
-                    className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-background/95 text-foreground shadow-soft transition-smooth opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-                    aria-label="Remove"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              ))}
+              {previews.map((src, i) => {
+                const isVideo = files[i]?.type.startsWith("video/");
+                return (
+                  <div key={i} className="group relative aspect-square overflow-hidden rounded-xl border border-border bg-muted">
+                    {isVideo ? (
+                      <video src={src} className="h-full w-full object-cover" muted playsInline />
+                    ) : (
+                      <img src={src} alt={`Preview ${i + 1}`} className="h-full w-full object-cover" />
+                    )}
+                    {isVideo && (
+                      <span className="absolute left-1 bottom-1 inline-flex items-center gap-1 rounded-full bg-background/90 px-1.5 py-0.5 text-[10px] font-semibold text-foreground shadow-soft">
+                        <Video className="h-3 w-3" /> Video
+                      </span>
+                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFile(i);
+                      }}
+                      className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-background/95 text-foreground shadow-soft transition-smooth opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                      aria-label="Remove"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
 

@@ -30,6 +30,17 @@ const Closet = () => {
     setTimeout(() => target?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
   }, [stage]);
 
+  // When user taps the Camera icon in the header (?add=1), scroll to the
+  // "Add more pieces" section so they jump straight into the upload flow.
+  useEffect(() => {
+    if (!addRequested) return;
+    setStage("wardrobe");
+    setTimeout(() => {
+      const el = document.querySelector('[data-add-section]') as HTMLElement | null;
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 250);
+  }, [addRequested]);
+
   if (loading) {
     return <div className="flex min-h-screen items-center justify-center bg-background"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   }

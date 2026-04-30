@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageProvider";
 import type { Lang } from "@/i18n/translations";
-import { ArrowRight, BadgeCheck, AlertTriangle, Pencil, Shirt, Footprints, Watch } from "lucide-react";
+import { ArrowRight, BadgeCheck, AlertTriangle, Pencil, Shirt, Footprints, Watch, ShoppingBag, Glasses, Crown } from "lucide-react";
 import { useWardrobe, type WardrobeItem } from "@/state/WardrobeContext";
 import { ItemEditDialog } from "./ItemEditDialog";
 import { UploadSection } from "./UploadSection";
@@ -41,7 +41,7 @@ export const WardrobeGrid = ({ onNext, defaultAdding = false }: Props) => {
         ))}
       </div>
 
-      <div className="mt-8 rounded-3xl border border-border bg-card p-5 shadow-card md:p-6">
+      <div data-add-section className="mt-8 rounded-3xl border border-border bg-card p-5 shadow-card md:p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h3 className="font-display text-2xl font-bold">{t.wardrobe.addMoreTitle}</h3>
@@ -122,7 +122,7 @@ const ItemCard = ({
           style={{ backgroundColor: it.color_hex }}
           aria-hidden
         >
-          <CategoryIcon category={it.category} hex={it.color_hex} />
+          <CategoryIcon category={it.category} type={`${it.type_en} ${it.type_tr}`} hex={it.color_hex} />
         </div>
         <div className="min-w-0 flex-1 pr-8">
           <div className="font-display text-lg font-bold leading-tight truncate">
@@ -193,19 +193,54 @@ const Tag = ({ label, value }: { label: string; value: string }) => (
   </span>
 );
 
-// Contrast-aware white/black icon to avoid weird colored emojis on every card.
-const CategoryIcon = ({ category, hex }: { category: string; hex?: string }) => {
+// Contrast-aware icon picked from category + free-text type so a hat doesn't
+// show a watch and a bag doesn't show a shirt.
+const PantsIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
+    <path d="M5 3h14l-1 6-1 12h-4l-1-9-1 9H7L6 9 5 3Z" />
+    <path d="M5 3h14" />
+  </svg>
+);
+const ShortsIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
+    <path d="M5 4h14l-1 6-1 7h-4l-1-6-1 6H7l-1-7-1-6Z" />
+    <path d="M5 4h14" />
+  </svg>
+);
+const DressIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
+    <path d="M9 3h6l1 4-2 2 4 13H6l4-13-2-2 1-4Z" />
+  </svg>
+);
+
+const CategoryIcon = ({ category, type, hex }: { category: string; type?: string; hex?: string }) => {
   const isLight = isLightColor(hex);
   const cls = `h-7 w-7 ${isLight ? "text-black/70" : "text-white/90"}`;
+  const t = (type || "").toLowerCase();
+
+  // Subtype matches first — these win over the broad category bucket.
+  if (/(hat|cap|beanie|şapka|sapka|bere|kasket)/.test(t)) return <Crown className={cls} />;
+  if (/(glass|sunglass|gözlük|gozluk)/.test(t)) return <Glasses className={cls} />;
+  if (/(bag|backpack|tote|purse|clutch|çanta|canta|sırt|sirt)/.test(t)) return <ShoppingBag className={cls} />;
+  if (/(watch|saat|bracelet|necklace|ring|earring|takı|taki|kolye|yüzük|yuzuk|bileklik|küpe|kupe)/.test(t)) return <Watch className={cls} />;
+  if (/(short|şort|sort|bermuda)/.test(t)) return <ShortsIcon className={cls} />;
+  if (/(pant|trouser|jean|chino|legging|pantolon|kot|eşofman|esofman)/.test(t)) return <PantsIcon className={cls} />;
+  if (/(skirt|etek)/.test(t)) return <DressIcon className={cls} />;
+  if (/(dress|elbise|tulum|jumpsuit)/.test(t)) return <DressIcon className={cls} />;
+  if (/(shoe|sneaker|boot|sandal|heel|loafer|ayakkabı|ayakkabi|bot|sandalet|topuk)/.test(t))
+    return <Footprints className={cls} />;
+
   switch (category) {
     case "shoes":
       return <Footprints className={cls} />;
     case "accessory":
       return <Watch className={cls} />;
+    case "bottom":
+      return <PantsIcon className={cls} />;
+    case "dress":
+      return <DressIcon className={cls} />;
     case "outer":
     case "top":
-    case "dress":
-    case "bottom":
     case "underwear":
     default:
       return <Shirt className={cls} />;
