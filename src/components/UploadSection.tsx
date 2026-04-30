@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Camera, Video, Upload, Loader2, X } from "lucide-react";
+import { Upload, Loader2, X, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageProvider";
 import { useWardrobe, WardrobeItem } from "@/state/WardrobeContext";
