@@ -41,7 +41,7 @@ export const WardrobeGrid = ({ onNext, defaultAdding = false }: Props) => {
         ))}
       </div>
 
-      <div className="mt-8 rounded-3xl border border-border bg-card p-5 shadow-card md:p-6">
+      <div data-add-section className="mt-8 rounded-3xl border border-border bg-card p-5 shadow-card md:p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h3 className="font-display text-2xl font-bold">{t.wardrobe.addMoreTitle}</h3>
