@@ -126,27 +126,6 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
         )}
 
         <div className={compact ? "rounded-2xl border border-border bg-muted/30 p-4" : "rounded-3xl border border-border bg-card p-6 shadow-card md:p-8"}>
-          {/* Mode switcher */}
-          <div className="mb-6 inline-flex rounded-full bg-muted p-1">
-            <button
-              onClick={() => setMode("photo")}
-              className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-smooth ${
-                mode === "photo" ? "bg-card text-foreground shadow-soft" : "text-muted-foreground"
-              }`}
-            >
-              <Camera className="h-4 w-4" />
-              {t.upload.photo}
-            </button>
-            <button
-              onClick={() => setMode("video")}
-              disabled
-              title="Coming soon"
-              className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-smooth opacity-50 cursor-not-allowed text-muted-foreground`}
-            >
-              <Video className="h-4 w-4" />
-              {t.upload.video}
-            </button>
-          </div>
 
           {/* Drop zone */}
           <div
