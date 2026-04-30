@@ -122,7 +122,7 @@ const ItemCard = ({
           style={{ backgroundColor: it.color_hex }}
           aria-hidden
         >
-          <CategoryIcon category={it.category} hex={it.color_hex} />
+          <CategoryIcon category={it.category} type={`${it.type_en} ${it.type_tr}`} hex={it.color_hex} />
         </div>
         <div className="min-w-0 flex-1 pr-8">
           <div className="font-display text-lg font-bold leading-tight truncate">
