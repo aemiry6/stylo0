@@ -179,7 +179,7 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
                       e.stopPropagation();
                       removeFile(i);
                     }}
-                    className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-background/90 text-foreground opacity-0 shadow-soft transition-smooth group-hover:opacity-100"
+                    className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-background/95 text-foreground shadow-soft transition-smooth opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                     aria-label="Remove"
                   >
                     <X className="h-3.5 w-3.5" />
@@ -204,6 +204,13 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
               t.upload.analyze
             )}
           </Button>
+
+          {unsureNotice && (
+            <div className="mt-4 flex items-start gap-2 rounded-2xl border border-destructive/30 bg-destructive/5 p-3 text-sm">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+              <p className="text-foreground">{unsureNotice}</p>
+            </div>
+          )}
 
           <p className="mt-4 text-center text-xs text-muted-foreground">
             ✨ Powered by Lovable AI · Gemini Vision
