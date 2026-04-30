@@ -99,9 +99,17 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
         id: `w-${Date.now()}-${i}`,
       }));
       if (items.length === 0) {
-        toast.error("Kıyafet algılanmadı, daha net bir foto dener misin? / No clothes detected — try a clearer photo.");
+        const msg = "Hiçbir kıyafet net algılanmadı. Daha net bir fotoğraf çeker misin? / No clothes were clearly detected — please retake with a clearer photo.";
+        setUnsureNotice(msg);
+        toast.error(msg);
         setAnalyzing(false);
         return;
+      }
+      const lowCount = items.filter((it: any) => (it.confidence ?? 1) < 0.55).length;
+      if (lowCount / items.length > 0.5) {
+        setUnsureNotice(
+          "Bazı parçalardan emin değiliz. Daha net fotoğraflarla tekrar denersen tanıma kalitesi artar. / Some pieces are uncertain — try retaking those with clearer photos.",
+        );
       }
       if (append) addItems(items);
       else setWardrobe(items);
