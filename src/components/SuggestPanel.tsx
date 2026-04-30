@@ -313,7 +313,26 @@ const WeatherCard = ({
     );
   }
 
+  if (status === "prompting") {
+    return (
+      <div className="rounded-2xl border-2 border-dashed border-primary/40 bg-primary/5 p-6">
+        <div className="flex items-start gap-3">
+          <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+          <div className="flex-1">
+            <div className="font-semibold text-foreground">{t.suggest.weatherAsk}</div>
+            <p className="mt-1 text-sm text-muted-foreground">{t.suggest.weatherAskDesc}</p>
+            <Button onClick={onRetry} size="sm" className="mt-3 rounded-full bg-gradient-coral">
+              <MapPin className="mr-1.5 h-4 w-4" />
+              {t.suggest.weatherAllow}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (status === "denied") {
+    const canSubmit = manualWeather.trim().length > 0;
     return (
       <div className="rounded-2xl border-2 border-dashed border-destructive/40 bg-destructive/5 p-6">
         <div className="flex items-start gap-3">
@@ -327,10 +346,21 @@ const WeatherCard = ({
               placeholder={t.suggest.weatherManualPlaceholder}
               className="mt-4 min-h-24 rounded-2xl bg-background"
             />
-            <Button onClick={onRetry} variant="outline" size="sm" className="mt-3 rounded-full">
-              <MapPin className="mr-1.5 h-4 w-4" />
-              {t.suggest.weatherRetry}
-            </Button>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button
+                disabled={!canSubmit}
+                onClick={() => toast.success(lang === "tr" ? "Hava bilgisi alındı" : lang === "de" ? "Wetter übernommen" : lang === "es" ? "Clima registrado" : "Weather noted")}
+                size="sm"
+                className="rounded-full bg-gradient-coral"
+              >
+                <Sparkles className="mr-1.5 h-4 w-4" />
+                {t.suggest.weatherSend}
+              </Button>
+              <Button onClick={onRetry} variant="outline" size="sm" className="rounded-full">
+                <MapPin className="mr-1.5 h-4 w-4" />
+                {t.suggest.weatherRetry}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
