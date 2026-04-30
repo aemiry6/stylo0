@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Camera, Video, Upload, Loader2, X } from "lucide-react";
+import { Upload, Loader2, X, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageProvider";
 import { useWardrobe, WardrobeItem } from "@/state/WardrobeContext";
@@ -49,21 +49,21 @@ const compress = async (file: File): Promise<string> => {
 export const UploadSection = ({ onAnalyzed, append = false, compact = false }: Props) => {
   const { t } = useLang();
   const { setWardrobe, addItems } = useWardrobe();
-  const [mode, setMode] = useState<"photo" | "video">("photo");
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [unsureNotice, setUnsureNotice] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFiles = async (list: FileList | null) => {
-    if (!list) return;
-    const arr = Array.from(list).slice(0, 8);
-    setFiles(arr);
-    const previews = await Promise.all(
-      arr.filter((f) => f.type.startsWith("image/")).map((f) => fileToDataUrl(f)),
-    );
-    setPreviews(previews);
+    if (!list || list.length === 0) return;
+    const incoming = Array.from(list).filter((f) => f.type.startsWith("image/"));
+    const merged = [...files, ...incoming].slice(0, 12);
+    setFiles(merged);
+    const newPreviews = await Promise.all(merged.map((f) => fileToDataUrl(f)));
+    setPreviews(newPreviews);
+    setUnsureNotice(null);
   };
 
   const removeFile = (i: number) => {
@@ -99,9 +99,17 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
         id: `w-${Date.now()}-${i}`,
       }));
       if (items.length === 0) {
-        toast.error("Kıyafet algılanmadı, daha net bir foto dener misin? / No clothes detected — try a clearer photo.");
+        const msg = "Hiçbir kıyafet net algılanmadı. Daha net bir fotoğraf çeker misin? / No clothes were clearly detected — please retake with a clearer photo.";
+        setUnsureNotice(msg);
+        toast.error(msg);
         setAnalyzing(false);
         return;
+      }
+      const lowCount = items.filter((it: any) => (it.confidence ?? 1) < 0.55).length;
+      if (lowCount / items.length > 0.5) {
+        setUnsureNotice(
+          "Bazı parçalardan emin değiliz. Daha net fotoğraflarla tekrar denersen tanıma kalitesi artar. / Some pieces are uncertain — try retaking those with clearer photos.",
+        );
       }
       if (append) addItems(items);
       else setWardrobe(items);
@@ -126,27 +134,6 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
         )}
 
         <div className={compact ? "rounded-2xl border border-border bg-muted/30 p-4" : "rounded-3xl border border-border bg-card p-6 shadow-card md:p-8"}>
-          {/* Mode switcher */}
-          <div className="mb-6 inline-flex rounded-full bg-muted p-1">
-            <button
-              onClick={() => setMode("photo")}
-              className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-smooth ${
-                mode === "photo" ? "bg-card text-foreground shadow-soft" : "text-muted-foreground"
-              }`}
-            >
-              <Camera className="h-4 w-4" />
-              {t.upload.photo}
-            </button>
-            <button
-              onClick={() => setMode("video")}
-              disabled
-              title="Coming soon"
-              className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-smooth opacity-50 cursor-not-allowed text-muted-foreground`}
-            >
-              <Video className="h-4 w-4" />
-              {t.upload.video}
-            </button>
-          </div>
 
           {/* Drop zone */}
           <div
@@ -192,7 +179,7 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
                       e.stopPropagation();
                       removeFile(i);
                     }}
-                    className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-background/90 text-foreground opacity-0 shadow-soft transition-smooth group-hover:opacity-100"
+                    className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-background/95 text-foreground shadow-soft transition-smooth opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                     aria-label="Remove"
                   >
                     <X className="h-3.5 w-3.5" />
@@ -217,6 +204,13 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
               t.upload.analyze
             )}
           </Button>
+
+          {unsureNotice && (
+            <div className="mt-4 flex items-start gap-2 rounded-2xl border border-destructive/30 bg-destructive/5 p-3 text-sm">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+              <p className="text-foreground">{unsureNotice}</p>
+            </div>
+          )}
 
           <p className="mt-4 text-center text-xs text-muted-foreground">
             ✨ Powered by Lovable AI · Gemini Vision

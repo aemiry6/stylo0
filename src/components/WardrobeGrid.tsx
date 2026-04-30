@@ -2,20 +2,20 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageProvider";
 import type { Lang } from "@/i18n/translations";
-import { ArrowRight, BadgeCheck, AlertTriangle, Pencil } from "lucide-react";
+import { ArrowRight, BadgeCheck, AlertTriangle, Pencil, Shirt, Footprints, Watch } from "lucide-react";
 import { useWardrobe, type WardrobeItem } from "@/state/WardrobeContext";
 import { ItemEditDialog } from "./ItemEditDialog";
 import { UploadSection } from "./UploadSection";
 
-type Props = { onNext: () => void };
+type Props = { onNext: () => void; defaultAdding?: boolean };
 
 const LOW_CONFIDENCE = 0.7;
 
-export const WardrobeGrid = ({ onNext }: Props) => {
+export const WardrobeGrid = ({ onNext, defaultAdding = false }: Props) => {
   const { t, lang } = useLang();
   const { wardrobe } = useWardrobe();
   const [editing, setEditing] = useState<WardrobeItem | null>(null);
-  const [adding, setAdding] = useState(false);
+  const [adding, setAdding] = useState(defaultAdding);
 
   if (wardrobe.length === 0) return null;
 
@@ -118,10 +118,11 @@ const ItemCard = ({
 
       <div className="mb-4 flex items-start gap-4">
         <div
-          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-3xl shadow-soft"
+          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl shadow-soft ring-1 ring-border/50"
           style={{ backgroundColor: it.color_hex }}
+          aria-hidden
         >
-          <span className="drop-shadow">{it.emoji}</span>
+          <CategoryIcon category={it.category} hex={it.color_hex} />
         </div>
         <div className="min-w-0 flex-1 pr-8">
           <div className="font-display text-lg font-bold leading-tight truncate">
@@ -191,3 +192,33 @@ const Tag = ({ label, value }: { label: string; value: string }) => (
     <span className="text-foreground">{value}</span>
   </span>
 );
+
+// Contrast-aware white/black icon to avoid weird colored emojis on every card.
+const CategoryIcon = ({ category, hex }: { category: string; hex?: string }) => {
+  const isLight = isLightColor(hex);
+  const cls = `h-7 w-7 ${isLight ? "text-black/70" : "text-white/90"}`;
+  switch (category) {
+    case "shoes":
+      return <Footprints className={cls} />;
+    case "accessory":
+      return <Watch className={cls} />;
+    case "outer":
+    case "top":
+    case "dress":
+    case "bottom":
+    case "underwear":
+    default:
+      return <Shirt className={cls} />;
+  }
+};
+
+const isLightColor = (hex?: string) => {
+  if (!hex) return false;
+  const m = hex.replace("#", "");
+  if (m.length !== 6) return false;
+  const r = parseInt(m.slice(0, 2), 16);
+  const g = parseInt(m.slice(2, 4), 16);
+  const b = parseInt(m.slice(4, 6), 16);
+  // Perceived luminance
+  return (r * 0.299 + g * 0.587 + b * 0.114) > 170;
+};

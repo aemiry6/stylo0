@@ -10,6 +10,7 @@ const baseTranslations = {
       outfits: "Kombinlerim",
       login: "Giriş",
       logout: "Çıkış",
+      addClothes: "Yeni ekle",
     },
     auth: {
       signinTitle: "Giriş yap",
@@ -111,8 +112,11 @@ const baseTranslations = {
       weatherRetry: "Tekrar dene",
       weatherAllow: "Konumuna izin ver",
       weatherAllowDesc: "Sana en uygun kombini önerebilmemiz için hava durumuna ihtiyacımız var.",
-      weatherDenied: "Konum izni verilmedi. Lütfen tarayıcı ayarlarından izin ver.",
+      weatherDenied: "Konum izni verilmedi. İstersen havayı kendin yazabilirsin.",
       weatherManualPlaceholder: "Hava nasıl? Örn: Bugün 12 derece, rüzgarlı ve yağmur ihtimali var.",
+      weatherSend: "Bu havayı kullan",
+      weatherAsk: "Konumunu paylaş",
+      weatherAskDesc: "Bugünün havasına göre en doğru kombini önerebilmemiz için konumuna ihtiyacımız var.",
       generate: "Kombinimi öner",
       generating: "Stilini hazırlıyoruz…",
     },
@@ -138,7 +142,7 @@ const baseTranslations = {
   },
   en: {
     brand: "Stylo",
-    nav: { how: "How it works", try: "Try it now", closet: "My closet", outfits: "My outfits", login: "Log in", logout: "Log out" },
+    nav: { how: "How it works", try: "Try it now", closet: "My closet", outfits: "My outfits", login: "Log in", logout: "Log out", addClothes: "Add new" },
     auth: {
       signinTitle: "Log in",
       signupTitle: "Create profile",
@@ -239,8 +243,11 @@ const baseTranslations = {
       weatherRetry: "Try again",
       weatherAllow: "Allow location",
       weatherAllowDesc: "We need the weather to pick the best outfit for you.",
-      weatherDenied: "Location permission denied. Please allow it in your browser settings.",
+      weatherDenied: "Location permission denied. You can describe the weather instead.",
       weatherManualPlaceholder: "How is the weather? Example: 12°C, windy, with a chance of rain.",
+      weatherSend: "Use this weather",
+      weatherAsk: "Share your location",
+      weatherAskDesc: "We need today's weather to recommend the best outfit for you.",
       generate: "Style me",
       generating: "Crafting your look…",
     },
@@ -272,7 +279,7 @@ export const translations: Record<Lang, Translation> = {
   ...baseTranslations,
   de: {
     ...baseTranslations.en,
-    nav: { how: "So funktioniert es", try: "Jetzt testen", closet: "Mein Schrank", outfits: "Meine Outfits", login: "Einloggen", logout: "Ausloggen" },
+    nav: { how: "So funktioniert es", try: "Jetzt testen", closet: "Mein Schrank", outfits: "Meine Outfits", login: "Einloggen", logout: "Ausloggen", addClothes: "Hinzufügen" },
     auth: {
       ...baseTranslations.en.auth,
       signinTitle: "Einloggen",
@@ -307,7 +314,7 @@ export const translations: Record<Lang, Translation> = {
     },
     upload: { ...baseTranslations.en.upload, title: "Kleiderschrank hochladen", subtitle: "Fotos oder ein kurzes Video. Hier beginnt alles.", drop: "Hier ablegen oder auswählen", hint: "JPG, PNG oder MP4 — gutes Licht hilft sehr", photo: "Fotos", video: "Video", analyze: "Analysieren", analyzing: "Stylo erkennt deinen Kleiderschrank…" },
     wardrobe: { ...baseTranslations.en.wardrobe, title: "Dein Kleiderschrank ist bereit", subtitle: "Stylo hat {count} Teile erkannt. Du kannst sie jederzeit bearbeiten.", next: "Outfit vorschlagen", tags: { color: "Farbe", type: "Art", material: "Material", pattern: "Muster", fit: "Schnitt", style: "Stil", weight: "Dicke", season: "Saison", brand: "Marke", details: "Details" }, confidence: "Erkennungssicherheit", lowConfidence: "Hier bin ich nicht sicher", lowConfidenceHint: "Ein klareres Foto dieses Teils verbessert die Erkennung.", addMoreTitle: "Fehlt etwas?", addMoreSubtitle: "Du kannst jederzeit neue Teile hinzufügen oder falsche entfernen.", addMoreCta: "Neues Teil hinzufügen", edit: { title: "Ist dieses Teil korrekt?", subtitle: "Wenn es falsch ist, kannst du es entfernen oder neu aufnehmen.", retake: "Richtiges Teil aufnehmen", remove: "Nicht in meinem Schrank", cancel: "Abbrechen", replacing: "Wird neu erkannt…", replaced: "Teil aktualisiert", removed: "Teil entfernt", noDetected: "Auf diesem Foto wurde keine Kleidung erkannt." } },
-    suggest: { ...baseTranslations.en.suggest, title: "Outfit für heute", subtitle: "Wähle deinen Plan — wir holen das Wetter über deinen Standort.", purpose: "Was steht heute an?", purposes: { work: "Arbeit", date: "Date", casual: "Alltag", sport: "Sport", party: "Party", travel: "Reise", school: "Schule", event: "Event", shopping: "Shopping", dinner: "Abendessen", home: "Zuhause", friends: "Freunde" }, weather: "Heutiges Wetter", weatherLoading: "Wetter wird geladen…", weatherError: "Wetter konnte nicht geladen werden. Versuch es erneut.", weatherRetry: "Erneut versuchen", weatherAllow: "Standort erlauben", weatherAllowDesc: "Wir brauchen das Wetter, um dir das beste Outfit vorzuschlagen.", weatherDenied: "Standortzugriff verweigert. Bitte erlaube ihn in deinen Browsereinstellungen.", weatherManualPlaceholder: "Wie ist das Wetter? Beispiel: 12 °C, windig, Regen möglich.", generate: "Outfit vorschlagen", generating: "Wir stylen deinen Look…" },
+    suggest: { ...baseTranslations.en.suggest, title: "Outfit für heute", subtitle: "Wähle deinen Plan — wir holen das Wetter über deinen Standort.", purpose: "Was steht heute an?", purposes: { work: "Arbeit", date: "Date", casual: "Alltag", sport: "Sport", party: "Party", travel: "Reise", school: "Schule", event: "Event", shopping: "Shopping", dinner: "Abendessen", home: "Zuhause", friends: "Freunde" }, weather: "Heutiges Wetter", weatherLoading: "Wetter wird geladen…", weatherError: "Wetter konnte nicht geladen werden. Versuch es erneut.", weatherRetry: "Erneut versuchen", weatherAllow: "Standort erlauben", weatherAllowDesc: "Wir brauchen das Wetter, um dir das beste Outfit vorzuschlagen.", weatherDenied: "Standortzugriff verweigert. Du kannst das Wetter auch selbst beschreiben.", weatherManualPlaceholder: "Wie ist das Wetter? Beispiel: 12 °C, windig, Regen möglich.", weatherSend: "Dieses Wetter verwenden", weatherAsk: "Standort teilen", weatherAskDesc: "Wir brauchen das heutige Wetter, um dir das passende Outfit vorzuschlagen.", generate: "Outfit vorschlagen", generating: "Wir stylen deinen Look…" },
     outfit: { ...baseTranslations.en.outfit, title: "Dein Outfit ist bereit", why: "Warum dieses Outfit?", whyText: "Wir haben passende Teile für Wetter und Anlass kombiniert.", like: "Gefällt mir", saved: "Outfit gespeichert", saveError: "Outfit konnte nicht gespeichert werden", loginToSave: "Zum Speichern bitte einloggen", historyTitle: "Schon getragen", historySubtitle: "Hier siehst du deine gespeicherten Outfits.", emptyHistory: "Noch keine gespeicherten Outfits.", shuffle: "Anderes Outfit", restart: "Zurück zum Schrank", parts: { top: "Oberteil", bottom: "Unterteil", shoes: "Schuhe", outer: "Jacke", accessory: "Accessoire" } },
     weather: { sunny: "Sonnig", cloudy: "Bewölkt", rainy: "Regnerisch", cold: "Kalt", hot: "Heiß" },
     footer: "Stylo · Mit Liebe und KI gemacht",
@@ -315,7 +322,7 @@ export const translations: Record<Lang, Translation> = {
   },
   es: {
     ...baseTranslations.en,
-    nav: { how: "Cómo funciona", try: "Probar ahora", closet: "Mi armario", outfits: "Mis looks", login: "Entrar", logout: "Salir" },
+    nav: { how: "Cómo funciona", try: "Probar ahora", closet: "Mi armario", outfits: "Mis looks", login: "Entrar", logout: "Salir", addClothes: "Añadir" },
     auth: {
       ...baseTranslations.en.auth,
       signinTitle: "Entrar",
@@ -351,7 +358,7 @@ export const translations: Record<Lang, Translation> = {
     },
     upload: { ...baseTranslations.en.upload, title: "Sube tu armario", subtitle: "Fotos o un video corto. Aquí empieza todo.", drop: "Suelta aquí o elige", hint: "JPG, PNG o MP4 — buena luz ayuda mucho", photo: "Fotos", video: "Video", analyze: "Analizar", analyzing: "Stylo está leyendo tu armario…" },
     wardrobe: { ...baseTranslations.en.wardrobe, title: "Tu armario está listo", subtitle: "Stylo identificó {count} prendas. Puedes editarlas cuando quieras.", next: "Recibir un look", tags: { color: "Color", type: "Tipo", material: "Material", pattern: "Estampado", fit: "Corte", style: "Estilo", weight: "Grosor", season: "Temporada", brand: "Marca", details: "Detalles" }, confidence: "Confianza de reconocimiento", lowConfidence: "No estoy seguro de esta", lowConfidenceHint: "Una foto más clara de esta prenda mejorará el reconocimiento.", addMoreTitle: "¿Falta algo?", addMoreSubtitle: "Puedes añadir prendas nuevas o eliminar las incorrectas cuando quieras.", addMoreCta: "Añadir prenda", edit: { title: "¿Esta prenda es correcta?", subtitle: "Si está mal, puedes eliminarla o volver a fotografiarla.", retake: "Fotografiar la correcta", remove: "No está en mi armario", cancel: "Cancelar", replacing: "Reconociendo de nuevo…", replaced: "Prenda actualizada", removed: "Prenda eliminada", noDetected: "No se detectó ropa en esta foto." } },
-    suggest: { ...baseTranslations.en.suggest, title: "Look de hoy", subtitle: "Elige tu plan — tomaremos el clima desde tu ubicación.", purpose: "¿Cuál es tu plan?", purposes: { work: "Trabajo", date: "Cita", casual: "Casual", sport: "Deporte", party: "Fiesta", travel: "Viaje", school: "Escuela", event: "Evento", shopping: "Compras", dinner: "Cena", home: "Casa", friends: "Amigos" }, weather: "Clima de hoy", weatherLoading: "Obteniendo el clima…", weatherError: "No se pudo obtener el clima. Inténtalo de nuevo.", weatherRetry: "Reintentar", weatherAllow: "Permitir ubicación", weatherAllowDesc: "Necesitamos el clima para elegir el mejor look para ti.", weatherDenied: "Permiso de ubicación denegado. Permítelo en los ajustes del navegador.", weatherManualPlaceholder: "¿Cómo está el clima? Ejemplo: 12 °C, viento y posibilidad de lluvia.", generate: "Crear mi look", generating: "Preparando tu estilo…" },
+    suggest: { ...baseTranslations.en.suggest, title: "Look de hoy", subtitle: "Elige tu plan — tomaremos el clima desde tu ubicación.", purpose: "¿Cuál es tu plan?", purposes: { work: "Trabajo", date: "Cita", casual: "Casual", sport: "Deporte", party: "Fiesta", travel: "Viaje", school: "Escuela", event: "Evento", shopping: "Compras", dinner: "Cena", home: "Casa", friends: "Amigos" }, weather: "Clima de hoy", weatherLoading: "Obteniendo el clima…", weatherError: "No se pudo obtener el clima. Inténtalo de nuevo.", weatherRetry: "Reintentar", weatherAllow: "Permitir ubicación", weatherAllowDesc: "Necesitamos el clima para elegir el mejor look para ti.", weatherDenied: "Permiso de ubicación denegado. Puedes describir el clima manualmente.", weatherManualPlaceholder: "¿Cómo está el clima? Ejemplo: 12 °C, viento y posibilidad de lluvia.", weatherSend: "Usar este clima", weatherAsk: "Compartir tu ubicación", weatherAskDesc: "Necesitamos el clima de hoy para sugerir el mejor look.", generate: "Crear mi look", generating: "Preparando tu estilo…" },
     outfit: { ...baseTranslations.en.outfit, title: "Tu look está listo", why: "¿Por qué este look?", whyText: "Combinamos prendas adecuadas para el clima y la ocasión.", like: "Me encanta", saved: "Look guardado", saveError: "No se pudo guardar el look", loginToSave: "Entra para guardar este look", historyTitle: "Usados antes", historySubtitle: "Aquí puedes ver los looks que guardaste.", emptyHistory: "Aún no hay looks guardados.", shuffle: "Otro look", restart: "Volver al armario", parts: { top: "Parte superior", bottom: "Parte inferior", shoes: "Zapatos", outer: "Abrigo", accessory: "Accesorio" } },
     weather: { sunny: "Soleado", cloudy: "Nublado", rainy: "Lluvioso", cold: "Frío", hot: "Calor" },
     footer: "Stylo · Hecho con amor e IA",
