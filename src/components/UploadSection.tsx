@@ -264,21 +264,33 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
 
           {previews.length > 0 && (
             <div className="mt-5 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
-              {previews.map((src, i) => (
-                <div key={i} className="group relative aspect-square overflow-hidden rounded-xl border border-border">
-                  <img src={src} alt={`Preview ${i + 1}`} className="h-full w-full object-cover" />
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeFile(i);
-                    }}
-                    className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-background/95 text-foreground shadow-soft transition-smooth opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-                    aria-label="Remove"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              ))}
+              {previews.map((src, i) => {
+                const isVideo = files[i]?.type.startsWith("video/");
+                return (
+                  <div key={i} className="group relative aspect-square overflow-hidden rounded-xl border border-border bg-muted">
+                    {isVideo ? (
+                      <video src={src} className="h-full w-full object-cover" muted playsInline />
+                    ) : (
+                      <img src={src} alt={`Preview ${i + 1}`} className="h-full w-full object-cover" />
+                    )}
+                    {isVideo && (
+                      <span className="absolute left-1 bottom-1 inline-flex items-center gap-1 rounded-full bg-background/90 px-1.5 py-0.5 text-[10px] font-semibold text-foreground shadow-soft">
+                        <Video className="h-3 w-3" /> Video
+                      </span>
+                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFile(i);
+                      }}
+                      className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-background/95 text-foreground shadow-soft transition-smooth opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                      aria-label="Remove"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
 
