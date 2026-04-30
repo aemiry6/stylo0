@@ -93,9 +93,10 @@ export const SuggestPanel = ({ onResult }: Props) => {
     );
   };
 
-  // Auto-request once when panel mounts
+  // Don't auto-request location; the user explicitly chooses (especially on mobile).
+  // Status starts as "prompting" so the ask-permission card is shown.
   useEffect(() => {
-    if (weatherStatus === "idle") requestWeather();
+    if (weatherStatus === "idle") setWeatherStatus("prompting");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
