@@ -46,7 +46,44 @@ const compress = async (file: File): Promise<string> => {
   });
 };
 
-export const UploadSection = ({ onAnalyzed, append = false, compact = false }: Props) => {
+// Capture N evenly spaced frames from a video file as JPEG data URLs.
+const extractVideoFrames = async (file: File, count = 6): Promise<string[]> => {
+  const url = URL.createObjectURL(file);
+  const video = document.createElement("video");
+  video.src = url;
+  video.muted = true;
+  video.playsInline = true;
+  video.preload = "auto";
+  await new Promise<void>((resolve, reject) => {
+    video.onloadedmetadata = () => resolve();
+    video.onerror = () => reject(new Error("video load failed"));
+  });
+  const duration = isFinite(video.duration) && video.duration > 0 ? video.duration : 0;
+  const max = 1024;
+  let { videoWidth: width, videoHeight: height } = video;
+  if (width > max || height > max) {
+    const ratio = Math.min(max / width, max / height);
+    width = Math.round(width * ratio);
+    height = Math.round(height * ratio);
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d")!;
+  const frames: string[] = [];
+  const n = duration > 0 ? count : 1;
+  for (let i = 0; i < n; i++) {
+    const t = duration > 0 ? (duration * (i + 0.5)) / n : 0;
+    await new Promise<void>((resolve) => {
+      video.onseeked = () => resolve();
+      try { video.currentTime = Math.min(t, Math.max(0, duration - 0.05)); } catch { resolve(); }
+    });
+    ctx.drawImage(video, 0, 0, width, height);
+    frames.push(canvas.toDataURL("image/jpeg", 0.82));
+  }
+  URL.revokeObjectURL(url);
+  return frames;
+};
   const { t } = useLang();
   const { setWardrobe, addItems } = useWardrobe();
   const [mode, setMode] = useState<"photo" | "video">("photo");
