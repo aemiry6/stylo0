@@ -84,6 +84,8 @@ const extractVideoFrames = async (file: File, count = 6): Promise<string[]> => {
   URL.revokeObjectURL(url);
   return frames;
 };
+
+export const UploadSection = ({ onAnalyzed, append = false, compact = false }: Props) => {
   const { t } = useLang();
   const { setWardrobe, addItems } = useWardrobe();
   const [mode, setMode] = useState<"photo" | "video">("photo");
