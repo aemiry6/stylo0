@@ -10,6 +10,7 @@ const baseTranslations = {
       outfits: "Kombinlerim",
       login: "Giriş",
       logout: "Çıkış",
+      addClothes: "Yeni ekle",
     },
     auth: {
       signinTitle: "Giriş yap",
@@ -138,7 +139,7 @@ const baseTranslations = {
   },
   en: {
     brand: "Stylo",
-    nav: { how: "How it works", try: "Try it now", closet: "My closet", outfits: "My outfits", login: "Log in", logout: "Log out" },
+    nav: { how: "How it works", try: "Try it now", closet: "My closet", outfits: "My outfits", login: "Log in", logout: "Log out", addClothes: "Add new" },
     auth: {
       signinTitle: "Log in",
       signupTitle: "Create profile",
@@ -272,7 +273,7 @@ export const translations: Record<Lang, Translation> = {
   ...baseTranslations,
   de: {
     ...baseTranslations.en,
-    nav: { how: "So funktioniert es", try: "Jetzt testen", closet: "Mein Schrank", outfits: "Meine Outfits", login: "Einloggen", logout: "Ausloggen" },
+    nav: { how: "So funktioniert es", try: "Jetzt testen", closet: "Mein Schrank", outfits: "Meine Outfits", login: "Einloggen", logout: "Ausloggen", addClothes: "Hinzufügen" },
     auth: {
       ...baseTranslations.en.auth,
       signinTitle: "Einloggen",
@@ -315,7 +316,7 @@ export const translations: Record<Lang, Translation> = {
   },
   es: {
     ...baseTranslations.en,
-    nav: { how: "Cómo funciona", try: "Probar ahora", closet: "Mi armario", outfits: "Mis looks", login: "Entrar", logout: "Salir" },
+    nav: { how: "Cómo funciona", try: "Probar ahora", closet: "Mi armario", outfits: "Mis looks", login: "Entrar", logout: "Salir", addClothes: "Añadir" },
     auth: {
       ...baseTranslations.en.auth,
       signinTitle: "Entrar",
