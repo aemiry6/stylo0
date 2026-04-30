@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageProvider";
 import type { Lang } from "@/i18n/translations";
-import { ArrowRight, BadgeCheck, AlertTriangle, Pencil } from "lucide-react";
+import { ArrowRight, BadgeCheck, AlertTriangle, Pencil, Shirt, Footprints, Glasses, Watch } from "lucide-react";
 import { useWardrobe, type WardrobeItem } from "@/state/WardrobeContext";
 import { ItemEditDialog } from "./ItemEditDialog";
 import { UploadSection } from "./UploadSection";
@@ -118,10 +118,11 @@ const ItemCard = ({
 
       <div className="mb-4 flex items-start gap-4">
         <div
-          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-3xl shadow-soft"
+          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl shadow-soft ring-1 ring-border/50"
           style={{ backgroundColor: it.color_hex }}
+          aria-hidden
         >
-          <span className="drop-shadow">{it.emoji}</span>
+          <CategoryIcon category={it.category} hex={it.color_hex} />
         </div>
         <div className="min-w-0 flex-1 pr-8">
           <div className="font-display text-lg font-bold leading-tight truncate">
