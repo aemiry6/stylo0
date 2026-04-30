@@ -127,9 +127,24 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
     if (files.length === 0) return;
     setAnalyzing(true);
     try {
-      const images = await Promise.all(
-        files.filter((f) => f.type.startsWith("image/")).map((f) => compress(f)),
-      );
+      let images: string[] = [];
+      if (mode === "video") {
+        const videoFile = files.find((f) => f.type.startsWith("video/"));
+        if (videoFile) {
+          try {
+            images = await extractVideoFrames(videoFile, 6);
+          } catch (err) {
+            console.error(err);
+            toast.error("Video okunamadı / Could not read video");
+            setAnalyzing(false);
+            return;
+          }
+        }
+      } else {
+        images = await Promise.all(
+          files.filter((f) => f.type.startsWith("image/")).map((f) => compress(f)),
+        );
+      }
       if (images.length === 0) {
         toast.error("Lütfen en az bir fotoğraf yükle / Please upload at least one image");
         setAnalyzing(false);
