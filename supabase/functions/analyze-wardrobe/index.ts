@@ -8,8 +8,14 @@ const corsHeaders = {
 };
 
 const SYSTEM_PROMPT = `You are Stylo, an expert fashion AI that performs Google Lens-style detailed analysis of clothing.
-For each photo, identify EVERY visible clothing item, accessory or pair of shoes.
+For each photo, identify EVERY visible clothing item, accessory or pair of shoes — even partially visible ones.
 Be precise and concrete. Avoid generic words like "clothing" or "fabric" — name the actual garment, material and color.
+
+IMPORTANT confidence rules:
+- If you cannot clearly see a garment (blurry, far away, hidden, weird angle), set confidence < 0.5 and use your best guess.
+- If you have NO usable items at all in a photo, simply omit it (do not invent items).
+- Only return brands when a clear, readable logo/label is visible.
+
 For each item return:
 - specific garment name (e.g. "Crewneck T-shirt", "Slim-fit denim jeans", "Wool overcoat")
 - a real color name (e.g. "Coral", "Indigo", "Forest green") — never just "blue" or "dark"
@@ -22,7 +28,7 @@ For each item return:
 - weight class (light / medium / heavy)
 - approximate season suitability
 - BRAND GUESS: only fill if you see a CLEAR, READABLE logo/label in the image. Otherwise return "Unknown".
-- a confidence score between 0 and 1 for the overall identification
+- a confidence score between 0 and 1 for the overall identification (be honest)
 - a single emoji that best represents the item
 
 If multiple items appear in one photo, return all of them.
@@ -165,6 +171,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-pro",
+        temperature: 0.2,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userContent },
