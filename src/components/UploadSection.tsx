@@ -59,10 +59,22 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
 
   const handleFiles = async (list: FileList | null) => {
     if (!list || list.length === 0) return;
-    const incoming = Array.from(list).filter((f) => f.type.startsWith("image/"));
-    const merged = [...files, ...incoming].slice(0, 12);
+    const want = mode === "photo" ? "image/" : "video/";
+    const incoming = Array.from(list).filter((f) => f.type.startsWith(want));
+    if (incoming.length === 0) {
+      toast.error(
+        mode === "photo"
+          ? "Lütfen fotoğraf seç / Please pick photos"
+          : "Lütfen bir video seç / Please pick a video",
+      );
+      return;
+    }
+    // For video mode keep only the most recent one
+    const merged = mode === "video" ? [incoming[0]] : [...files, ...incoming].slice(0, 12);
     setFiles(merged);
-    const newPreviews = await Promise.all(merged.map((f) => fileToDataUrl(f)));
+    const newPreviews = await Promise.all(
+      merged.map((f) => (f.type.startsWith("image/") ? fileToDataUrl(f) : Promise.resolve(URL.createObjectURL(f)))),
+    );
     setPreviews(newPreviews);
     setUnsureNotice(null);
   };
