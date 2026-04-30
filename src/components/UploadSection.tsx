@@ -49,21 +49,21 @@ const compress = async (file: File): Promise<string> => {
 export const UploadSection = ({ onAnalyzed, append = false, compact = false }: Props) => {
   const { t } = useLang();
   const { setWardrobe, addItems } = useWardrobe();
-  const [mode, setMode] = useState<"photo" | "video">("photo");
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [unsureNotice, setUnsureNotice] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFiles = async (list: FileList | null) => {
-    if (!list) return;
-    const arr = Array.from(list).slice(0, 8);
-    setFiles(arr);
-    const previews = await Promise.all(
-      arr.filter((f) => f.type.startsWith("image/")).map((f) => fileToDataUrl(f)),
-    );
-    setPreviews(previews);
+    if (!list || list.length === 0) return;
+    const incoming = Array.from(list).filter((f) => f.type.startsWith("image/"));
+    const merged = [...files, ...incoming].slice(0, 12);
+    setFiles(merged);
+    const newPreviews = await Promise.all(merged.map((f) => fileToDataUrl(f)));
+    setPreviews(newPreviews);
+    setUnsureNotice(null);
   };
 
   const removeFile = (i: number) => {
