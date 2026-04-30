@@ -49,6 +49,7 @@ const compress = async (file: File): Promise<string> => {
 export const UploadSection = ({ onAnalyzed, append = false, compact = false }: Props) => {
   const { t } = useLang();
   const { setWardrobe, addItems } = useWardrobe();
+  const [mode, setMode] = useState<"photo" | "video">("photo");
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
