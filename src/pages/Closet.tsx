@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { UploadSection } from "@/components/UploadSection";
@@ -18,6 +18,8 @@ const Closet = () => {
   const { wardrobe, loading: wardrobeLoading } = useWardrobe();
   const { lang, t } = useLang();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const addRequested = searchParams.get("add") === "1";
   const [stage, setStage] = useState<Stage>("wardrobe");
   const wardrobeRef = useRef<HTMLDivElement>(null);
   const suggestRef = useRef<HTMLDivElement>(null);
@@ -58,7 +60,7 @@ const Closet = () => {
           <UploadSection onAnalyzed={() => setStage("wardrobe")} />
         ) : (
           <div ref={wardrobeRef}>
-            <WardrobeGrid onNext={() => setStage("suggest")} />
+            <WardrobeGrid onNext={() => setStage("suggest")} defaultAdding={addRequested} />
           </div>
         )}
 
