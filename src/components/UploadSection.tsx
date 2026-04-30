@@ -202,6 +202,32 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
 
         <div className={compact ? "rounded-2xl border border-border bg-muted/30 p-4" : "rounded-3xl border border-border bg-card p-6 shadow-card md:p-8"}>
 
+          {/* Mode toggle */}
+          <div className="mb-4 inline-flex rounded-full border border-border bg-muted p-1 text-xs font-semibold">
+            <button
+              type="button"
+              onClick={() => {
+                setMode("photo");
+                setFiles([]);
+                setPreviews([]);
+              }}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-smooth ${mode === "photo" ? "bg-background shadow-soft text-foreground" : "text-muted-foreground"}`}
+            >
+              <ImageIcon className="h-3.5 w-3.5" /> {t.upload.photo}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMode("video");
+                setFiles([]);
+                setPreviews([]);
+              }}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-smooth ${mode === "video" ? "bg-background shadow-soft text-foreground" : "text-muted-foreground"}`}
+            >
+              <Video className="h-3.5 w-3.5" /> {t.upload.video}
+            </button>
+          </div>
+
           {/* Drop zone */}
           <div
             onDragOver={(e) => {
@@ -225,12 +251,12 @@ export const UploadSection = ({ onAnalyzed, append = false, compact = false }: P
               ref={inputRef}
               type="file"
               hidden
-              multiple
-              accept="image/*"
+              multiple={mode === "photo"}
+              accept={mode === "photo" ? "image/*" : "video/*"}
               onChange={(e) => handleFiles(e.target.files)}
             />
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-coral shadow-glow">
-              <Upload className="h-8 w-8 text-primary-foreground" />
+              {mode === "photo" ? <Upload className="h-8 w-8 text-primary-foreground" /> : <Video className="h-8 w-8 text-primary-foreground" />}
             </div>
             <p className="text-lg font-semibold">{t.upload.drop}</p>
             <p className="mt-1 text-sm text-muted-foreground">{t.upload.hint}</p>
