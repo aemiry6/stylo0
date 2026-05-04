@@ -1,1 +1,10 @@
 project_id = "nhcjgxpqfjwsfvjifrmv"
+
+[functions.chat-stylist]
+verify_jwt = false
+
+[functions.suggest-outfit]
+verify_jwt = false
+
+[functions.analyze-wardrobe]
+verify_jwt = false

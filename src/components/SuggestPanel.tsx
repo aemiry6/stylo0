@@ -116,7 +116,10 @@ export const SuggestPanel = ({ onResult }: Props) => {
         style: w.style_en, weight: w.weight, season: w.season_en,
       }));
       const currentIds = outfit?.items.map((i) => i.id) ?? [];
-      const savedCombinations = savedOutfits.slice(0, 12).map((s) => s.outfit.items.map((i) => i.id));
+      const savedCombinations = savedOutfits.slice(0, 30).map((s) => ({
+        date: s.worn_on || s.created_at,
+        item_ids: s.outfit.items.map((i) => i.id),
+      }));
 
       const { data, error } = await supabase.functions.invoke("suggest-outfit", {
         body: {

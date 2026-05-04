@@ -7,15 +7,24 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `You are Stylo, a personal stylist AI.
-You receive the user's wardrobe (a list of items with id, category, color, texture, weight) plus an occasion and weather.
-Pick the BEST outfit ONLY from items that exist in the wardrobe.
-Rules:
+const SYSTEM_PROMPT = `You are Stylo, a sharp personal stylist AI.
+You receive the user's wardrobe (id, category, color, material, pattern, fit, style, weight, season) plus a detailed occasion summary, target formality and weather.
+Compose the BEST outfit using ONLY items that exist in the wardrobe (match by id).
+
+Hard rules:
 - Match weight to weather: hot/sunny -> light only, cold/snow -> heavy outer required, rainy -> water-resistant outer if possible.
-- Match formality to purpose (work=smart, party=bold, sport=athletic, casual=relaxed, date=stylish, travel=comfortable+layered).
-- Prefer harmonious color combinations (complementary or analogous).
-- Use 2-5 items: at least one top + one bottom (or a dress) + shoes. Add outer/accessory only when it improves the outfit.
-- Always respond via the tool.`;
+- Match formality precisely to the requested formality target and the nuance of the occasion summary (e.g. first business dinner = polished smart, never athletic).
+- Prefer harmonious color combinations (complementary, analogous, or a confident neutral base + one accent).
+- Use 2-5 items: at least one top + one bottom (or a dress) + shoes. Add outer/accessory only when it clearly improves the look.
+
+Variety rules (CRITICAL):
+- You will receive a list of recently saved/worn outfits with dates. Treat anything from the last 7 days as "this week" and the last 30 days as "this month".
+- Never repeat the exact same combination of item ids from this week.
+- Avoid reusing more than ONE item that appeared in any outfit from this week. From this month, avoid reusing more than TWO items together.
+- Actively change the silhouette, dominant color, or layering vs. the most recent outfits — the user should feel a new look, not a remix.
+- If the wardrobe is small and you must reuse items, pair them with different partners and explain the twist in the rationale.
+
+Always respond via the tool. Rationale must (a) tie the outfit to the occasion summary in one warm sentence, and (b) briefly note how it differs from recent looks.`;
 
 const tool = {
   type: "function",
@@ -67,7 +76,7 @@ Weather: ${weather}${temperature !== undefined ? ` (${temperature}°C)` : ""}
 ${typeof weatherNote === "string" && weatherNote.trim() ? `User-described weather: ${weatherNote.trim()}` : ""}
 Preferred response language: ${lang || "tr"}
 ${Array.isArray(avoidIds) && avoidIds.length ? `Avoid repeating exactly these item ids together: ${avoidIds.join(", ")}` : ""}
-${Array.isArray(savedCombinations) && savedCombinations.length ? `Previously saved/worn outfits, do NOT repeat these exact combinations and prefer different silhouettes or colors where possible: ${JSON.stringify(savedCombinations)}` : ""}
+${Array.isArray(savedCombinations) && savedCombinations.length ? `Recently saved/worn outfits with dates (newest first). Apply the variety rules strictly: ${JSON.stringify(savedCombinations)}. Today is ${new Date().toISOString().slice(0, 10)}.` : ""}
 
 Pick the best outfit. Return only via the tool.`;
 
@@ -78,7 +87,7 @@ Pick the best outfit. Return only via the tool.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userMsg },
