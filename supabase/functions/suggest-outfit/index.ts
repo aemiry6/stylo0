@@ -76,7 +76,7 @@ Weather: ${weather}${temperature !== undefined ? ` (${temperature}°C)` : ""}
 ${typeof weatherNote === "string" && weatherNote.trim() ? `User-described weather: ${weatherNote.trim()}` : ""}
 Preferred response language: ${lang || "tr"}
 ${Array.isArray(avoidIds) && avoidIds.length ? `Avoid repeating exactly these item ids together: ${avoidIds.join(", ")}` : ""}
-${Array.isArray(savedCombinations) && savedCombinations.length ? `Previously saved/worn outfits, do NOT repeat these exact combinations and prefer different silhouettes or colors where possible: ${JSON.stringify(savedCombinations)}` : ""}
+${Array.isArray(savedCombinations) && savedCombinations.length ? `Recently saved/worn outfits with dates (newest first). Apply the variety rules strictly: ${JSON.stringify(savedCombinations)}. Today is ${new Date().toISOString().slice(0, 10)}.` : ""}
 
 Pick the best outfit. Return only via the tool.`;
 
