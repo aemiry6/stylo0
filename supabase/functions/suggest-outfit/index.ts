@@ -46,7 +46,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { wardrobe, purpose, weather, temperature, weatherNote, lang, avoidIds, savedCombinations } = await req.json();
+    const { wardrobe, purpose, purposeSummary, formality, weather, temperature, weatherNote, lang, avoidIds, savedCombinations } = await req.json();
     if (!Array.isArray(wardrobe) || wardrobe.length === 0) {
       return new Response(JSON.stringify({ error: "wardrobe[] required" }), {
         status: 400,
@@ -61,6 +61,8 @@ serve(async (req) => {
 ${JSON.stringify(wardrobe, null, 2)}
 
 Occasion: ${purpose}
+${purposeSummary ? `Detailed context: ${purposeSummary}` : ""}
+${formality ? `Formality target: ${formality}` : ""}
 Weather: ${weather}${temperature !== undefined ? ` (${temperature}°C)` : ""}
 ${typeof weatherNote === "string" && weatherNote.trim() ? `User-described weather: ${weatherNote.trim()}` : ""}
 Preferred response language: ${lang || "tr"}
