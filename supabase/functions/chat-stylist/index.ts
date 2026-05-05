@@ -56,7 +56,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages, lang = "tr", weather } = await req.json();
+    const { messages, lang = "tr", weather, wardrobeSummary } = await req.json();
     if (!Array.isArray(messages)) {
       return new Response(JSON.stringify({ error: "messages[] required" }), {
         status: 400,
@@ -71,6 +71,10 @@ serve(async (req) => {
       ? `${weather.condition || ""}${weather.temp !== undefined ? `, ${Math.round(weather.temp)}°C` : ""}${weather.city ? `, ${weather.city}` : ""}`
       : "";
 
+    const wardrobeMsg = wardrobeSummary
+      ? `Wardrobe summary (categories the user has uploaded, with counts and notable types/colors):\n${wardrobeSummary}`
+      : "";
+
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -79,7 +83,11 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
-        messages: [{ role: "system", content: SYSTEM(lang, weatherCtx) }, ...messages],
+        messages: [
+          { role: "system", content: SYSTEM(lang, weatherCtx) },
+          ...(wardrobeMsg ? [{ role: "system", content: wardrobeMsg }] : []),
+          ...messages,
+        ],
         tools: [tool],
         tool_choice: "auto",
         temperature: 0.8,
