@@ -80,22 +80,25 @@ ${Array.isArray(savedCombinations) && savedCombinations.length ? `Recently saved
 
 Pick the best outfit. Return only via the tool.`;
 
-    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: userMsg },
-        ],
-        tools: [tool],
-        tool_choice: { type: "function", function: { name: "compose_outfit" } },
-      }),
-    });
+    const callModel = async (model: string) =>
+      fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            { role: "user", content: userMsg },
+          ],
+          tools: [tool],
+          tool_choice: { type: "function", function: { name: "compose_outfit" } },
+        }),
+      });
+
+    let aiRes = await callModel("google/gemini-2.5-pro");
 
     if (!aiRes.ok) {
       if (aiRes.status === 429) {
@@ -118,9 +121,18 @@ Pick the best outfit. Return only via the tool.`;
       });
     }
 
-    const data = await aiRes.json();
-    const call = data.choices?.[0]?.message?.tool_calls?.[0];
+    let data = await aiRes.json();
+    let call = data.choices?.[0]?.message?.tool_calls?.[0];
     if (!call) {
+      console.warn("Pro model returned no tool call, retrying with flash. Raw:", JSON.stringify(data).slice(0, 800));
+      aiRes = await callModel("google/gemini-2.5-flash");
+      if (aiRes.ok) {
+        data = await aiRes.json();
+        call = data.choices?.[0]?.message?.tool_calls?.[0];
+      }
+    }
+    if (!call) {
+      console.error("No tool call after fallback. Raw:", JSON.stringify(data).slice(0, 800));
       return new Response(JSON.stringify({ error: "No outfit composed" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
