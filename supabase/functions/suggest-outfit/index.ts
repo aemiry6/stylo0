@@ -98,7 +98,7 @@ Pick the best outfit. Return only via the tool.`;
         }),
       });
 
-    let aiRes = await callModel("google/gemini-2.5-pro");
+    let aiRes = await callModel("google/gemini-2.5-flash");
 
     if (!aiRes.ok) {
       if (aiRes.status === 429) {
