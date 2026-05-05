@@ -124,8 +124,8 @@ Pick the best outfit. Return only via the tool.`;
     let data = await aiRes.json();
     let call = data.choices?.[0]?.message?.tool_calls?.[0];
     if (!call) {
-      console.warn("Pro model returned no tool call, retrying with flash. Raw:", JSON.stringify(data).slice(0, 800));
-      aiRes = await callModel("google/gemini-2.5-flash");
+      console.warn("Flash returned no tool call, retrying with pro. Raw:", JSON.stringify(data).slice(0, 800));
+      aiRes = await callModel("google/gemini-2.5-pro");
       if (aiRes.ok) {
         data = await aiRes.json();
         call = data.choices?.[0]?.message?.tool_calls?.[0];
