@@ -158,8 +158,22 @@ export const SuggestPanel = ({ onResult }: Props) => {
       const weatherCtx = weather
         ? { condition: lang === "tr" ? weather.conditionTr : weather.condition, temp: weather.temp, city: weather.city }
         : (manualWeather ? { condition: manualWeather } : null);
+
+      // Build a compact wardrobe summary grouped by category so the AI knows what the user owns
+      const byCat: Record<string, { type: string; color: string }[]> = {};
+      for (const w of wardrobe) {
+        const cat = (w.category || "other").toLowerCase();
+        (byCat[cat] ||= []).push({ type: w.type_en || "", color: w.color_en || "" });
+      }
+      const wardrobeSummary = Object.entries(byCat)
+        .map(([cat, items]) => {
+          const sample = items.slice(0, 8).map((i) => `${i.color} ${i.type}`.trim()).filter(Boolean).join(", ");
+          return `- ${cat} (${items.length}): ${sample}`;
+        })
+        .join("\n");
+
       const { data, error } = await supabase.functions.invoke("chat-stylist", {
-        body: { messages: next, lang, weather: weatherCtx },
+        body: { messages: next, lang, weather: weatherCtx, wardrobeSummary },
       });
       if (error) throw error;
       const reply = data?.reply || "";
