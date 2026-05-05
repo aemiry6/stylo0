@@ -80,22 +80,25 @@ ${Array.isArray(savedCombinations) && savedCombinations.length ? `Recently saved
 
 Pick the best outfit. Return only via the tool.`;
 
-    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: userMsg },
-        ],
-        tools: [tool],
-        tool_choice: { type: "function", function: { name: "compose_outfit" } },
-      }),
-    });
+    const callModel = async (model: string) =>
+      fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            { role: "user", content: userMsg },
+          ],
+          tools: [tool],
+          tool_choice: { type: "function", function: { name: "compose_outfit" } },
+        }),
+      });
+
+    let aiRes = await callModel("google/gemini-2.5-pro");
 
     if (!aiRes.ok) {
       if (aiRes.status === 429) {
