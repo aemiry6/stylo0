@@ -121,9 +121,18 @@ Pick the best outfit. Return only via the tool.`;
       });
     }
 
-    const data = await aiRes.json();
-    const call = data.choices?.[0]?.message?.tool_calls?.[0];
+    let data = await aiRes.json();
+    let call = data.choices?.[0]?.message?.tool_calls?.[0];
     if (!call) {
+      console.warn("Pro model returned no tool call, retrying with flash. Raw:", JSON.stringify(data).slice(0, 800));
+      aiRes = await callModel("google/gemini-2.5-flash");
+      if (aiRes.ok) {
+        data = await aiRes.json();
+        call = data.choices?.[0]?.message?.tool_calls?.[0];
+      }
+    }
+    if (!call) {
+      console.error("No tool call after fallback. Raw:", JSON.stringify(data).slice(0, 800));
       return new Response(JSON.stringify({ error: "No outfit composed" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
