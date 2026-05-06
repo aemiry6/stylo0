@@ -14,13 +14,13 @@ export const getItemEmoji = (item: MinimalItem): string => {
   const t = `${item.type_en || ""} ${item.type_tr || ""}`.toLowerCase();
   const cat = (item.category || "").toLowerCase();
 
+  // --- Outerwear (jackets/coats) — must come BEFORE sweater so "ceket" wins ---
+  if (/(coat|jacket|blazer|parka|trench|puffer|mont|ceket|palto|yelek|vest)/.test(t)) return "🧥";
+
   // --- Tops: long-sleeve vs short-sleeve ---
   if (/(t-?shirt|tee|tişört|tisort|tshirt|atlet|tank|singlet|kolsuz|crop top)/.test(t)) return "👕";
-  if (/(sweater|sweat|hoodie|kazak|triko|knit|jumper|pullover|sweatshirt|fleece|polar|kapşonlu|kapsonlu|uzun kollu)/.test(t)) return "🧥";
+  if (/(sweater|sweat|hoodie|kazak|triko|knit|jumper|pullover|sweatshirt|fleece|polar|kapşonlu|kapsonlu|uzun kollu)/.test(t)) return "👚";
   if (/(shirt|gömlek|gomlek|blouse|bluz|polo)/.test(t)) return "👔";
-
-  // --- Outerwear ---
-  if (/(coat|jacket|blazer|parka|trench|puffer|mont|ceket|palto|yelek|vest)/.test(t)) return "🧥";
 
   // --- Bottoms: shorts vs pants vs skirt ---
   if (/(short|şort|sort|bermuda)/.test(t)) return "🩳";
