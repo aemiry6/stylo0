@@ -66,7 +66,7 @@ export const OutfitResult = ({ onRestart, onShuffle }: Props) => {
                   className="mt-4 mb-4 flex h-32 w-full items-center justify-center rounded-2xl text-6xl shadow-soft"
                   style={{ backgroundColor: p.color_hex }}
                 >
-                  <span className="drop-shadow">{p.emoji}</span>
+                  <span className="drop-shadow">{getItemEmoji(p)}</span>
                 </div>
                 <div className="font-display text-lg font-bold">
                   {lang === "tr" ? p.type_tr : p.type_en}
