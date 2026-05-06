@@ -13,6 +13,7 @@ import { useLang } from "@/i18n/LanguageProvider";
 import { useWardrobe, type WardrobeItem } from "@/state/WardrobeContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { getItemEmoji } from "@/lib/itemEmoji";
 
 type Props = {
   item: WardrobeItem | null;
@@ -111,7 +112,7 @@ export const ItemEditDialog = ({ item, open, onOpenChange }: Props) => {
             className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-2xl shadow-soft"
             style={{ backgroundColor: item.color_hex }}
           >
-            <span>{item.emoji}</span>
+            <span>{getItemEmoji(item)}</span>
           </div>
           <div className="min-w-0">
             <div className="font-display text-base font-bold truncate">
