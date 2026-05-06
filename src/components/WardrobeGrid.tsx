@@ -119,11 +119,11 @@ const ItemCard = ({
 
       <div className="mb-4 flex items-start gap-4">
         <div
-          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl shadow-soft ring-1 ring-border/50"
+          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-3xl shadow-soft ring-1 ring-border/50"
           style={{ backgroundColor: it.color_hex }}
           aria-hidden
         >
-          <CategoryIcon category={it.category} type={`${it.type_en} ${it.type_tr}`} hex={it.color_hex} />
+          <span className="drop-shadow">{getItemEmoji(it)}</span>
         </div>
         <div className="min-w-0 flex-1 pr-8">
           <div className="font-display text-lg font-bold leading-tight truncate">
