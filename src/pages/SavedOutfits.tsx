@@ -53,7 +53,7 @@ const SavedOutfits = () => {
                     {saved.outfit.items.map((item) => (
                       <div key={item.id} className="rounded-2xl bg-muted/40 p-3">
                         <div className="flex h-16 items-center justify-center rounded-xl text-3xl shadow-soft" style={{ backgroundColor: item.color_hex }}>
-                          {item.emoji}
+                          {getItemEmoji(item)}
                         </div>
                         <div className="mt-2 truncate text-sm font-bold">{lang === "tr" ? item.type_tr : item.type_en}</div>
                         <div className="truncate text-xs text-muted-foreground">{lang === "tr" ? item.color_tr : item.color_en}</div>
