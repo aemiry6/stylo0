@@ -3,6 +3,7 @@ import { Heart, Shuffle, RotateCcw, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageProvider";
 import { useWardrobe } from "@/state/WardrobeContext";
+import { getItemEmoji } from "@/lib/itemEmoji";
 import { useAuth } from "@/state/AuthContext";
 import { toast } from "sonner";
 
