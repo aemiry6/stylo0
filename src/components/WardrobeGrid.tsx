@@ -6,7 +6,7 @@ import { ArrowRight, BadgeCheck, AlertTriangle, Pencil } from "lucide-react";
 import { useWardrobe, type WardrobeItem } from "@/state/WardrobeContext";
 import { ItemEditDialog } from "./ItemEditDialog";
 import { UploadSection } from "./UploadSection";
-import { getItemEmoji } from "@/lib/itemEmoji";
+import { getItemEmoji, emojiSilhouetteStyle } from "@/lib/itemEmoji";
 
 type Props = { onNext: () => void; defaultAdding?: boolean };
 
@@ -123,7 +123,7 @@ const ItemCard = ({
           style={{ backgroundColor: it.color_hex }}
           aria-hidden
         >
-          <span className="drop-shadow">{getItemEmoji(it)}</span>
+          <span className="drop-shadow" style={emojiSilhouetteStyle}>{getItemEmoji(it)}</span>
         </div>
         <div className="min-w-0 flex-1 pr-8">
           <div className="font-display text-lg font-bold leading-tight truncate">

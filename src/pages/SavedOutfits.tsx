@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/state/AuthContext";
 import { useWardrobe } from "@/state/WardrobeContext";
 import { useLang } from "@/i18n/LanguageProvider";
-import { getItemEmoji } from "@/lib/itemEmoji";
+import { getItemEmoji, emojiSilhouetteStyle } from "@/lib/itemEmoji";
 
 const SavedOutfits = () => {
   const { user, loading } = useAuth();
@@ -53,7 +53,7 @@ const SavedOutfits = () => {
                     {saved.outfit.items.map((item) => (
                       <div key={item.id} className="rounded-2xl bg-muted/40 p-3">
                         <div className="flex h-16 items-center justify-center rounded-xl text-3xl shadow-soft" style={{ backgroundColor: item.color_hex }}>
-                          {getItemEmoji(item)}
+                          <span style={emojiSilhouetteStyle}>{getItemEmoji(item)}</span>
                         </div>
                         <div className="mt-2 truncate text-sm font-bold">{lang === "tr" ? item.type_tr : item.type_en}</div>
                         <div className="truncate text-xs text-muted-foreground">{lang === "tr" ? item.color_tr : item.color_en}</div>
