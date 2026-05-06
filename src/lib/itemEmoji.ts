@@ -101,7 +101,7 @@ export const getItemEmoji = (item: MinimalItem): string => {
 // Inline style to render emoji as a near-monochrome silhouette so its built-in
 // color (e.g. pink top, cream jacket) doesn't clash with the colored swatch
 // background showing the real garment color.
-export const emojiSilhouetteStyle: React.CSSProperties = {
+export const emojiSilhouetteStyle = {
   filter: "grayscale(1) brightness(0.35) contrast(1.4)",
   WebkitFilter: "grayscale(1) brightness(0.35) contrast(1.4)",
-};
+} as const;
