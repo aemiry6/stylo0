@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageProvider";
 import type { Lang } from "@/i18n/translations";
-import { ArrowRight, BadgeCheck, AlertTriangle, Pencil, Shirt, Footprints, Watch, ShoppingBag, Glasses, Crown } from "lucide-react";
+import { ArrowRight, BadgeCheck, AlertTriangle, Pencil } from "lucide-react";
 import { useWardrobe, type WardrobeItem } from "@/state/WardrobeContext";
 import { ItemEditDialog } from "./ItemEditDialog";
 import { UploadSection } from "./UploadSection";
+import { getItemEmoji } from "@/lib/itemEmoji";
 
 type Props = { onNext: () => void; defaultAdding?: boolean };
 
