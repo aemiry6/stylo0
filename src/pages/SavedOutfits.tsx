@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/state/AuthContext";
 import { useWardrobe } from "@/state/WardrobeContext";
 import { useLang } from "@/i18n/LanguageProvider";
+import { getItemEmoji } from "@/lib/itemEmoji";
 
 const SavedOutfits = () => {
   const { user, loading } = useAuth();
