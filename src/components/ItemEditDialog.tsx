@@ -13,6 +13,7 @@ import { useLang } from "@/i18n/LanguageProvider";
 import { useWardrobe, type WardrobeItem } from "@/state/WardrobeContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { getItemEmoji } from "@/lib/itemEmoji";
 
 type Props = {
   item: WardrobeItem | null;
