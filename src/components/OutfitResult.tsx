@@ -3,7 +3,7 @@ import { Heart, Shuffle, RotateCcw, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageProvider";
 import { useWardrobe } from "@/state/WardrobeContext";
-import { getItemEmoji } from "@/lib/itemEmoji";
+import { getItemEmoji, emojiSilhouetteStyle } from "@/lib/itemEmoji";
 import { useAuth } from "@/state/AuthContext";
 import { toast } from "sonner";
 
@@ -66,7 +66,7 @@ export const OutfitResult = ({ onRestart, onShuffle }: Props) => {
                   className="mt-4 mb-4 flex h-32 w-full items-center justify-center rounded-2xl text-6xl shadow-soft"
                   style={{ backgroundColor: p.color_hex }}
                 >
-                  <span className="drop-shadow">{getItemEmoji(p)}</span>
+                  <span className="drop-shadow" style={emojiSilhouetteStyle}>{getItemEmoji(p)}</span>
                 </div>
                 <div className="font-display text-lg font-bold">
                   {lang === "tr" ? p.type_tr : p.type_en}
