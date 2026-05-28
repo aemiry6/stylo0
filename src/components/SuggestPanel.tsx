@@ -351,7 +351,9 @@ export const SuggestPanel = forwardRef<SuggestPanelHandle, Props>(({ onResult },
       </div>
     </section>
   );
-};
+});
+SuggestPanel.displayName = "SuggestPanel";
+
 
 const WeatherCard = ({
   status, weather, lang, t, onRetry, manualWeather, onManualWeatherChange,
