@@ -312,6 +312,20 @@ export const SuggestPanel = ({ onResult }: Props) => {
               disabled={thinking || generating}
             />
             <div className="flex gap-2">
+              {speechSupported && (
+                <Button
+                  onClick={toggleListening}
+                  disabled={thinking || generating}
+                  variant={listening ? "default" : "outline"}
+                  size="lg"
+                  className={`h-12 rounded-full ${listening ? "bg-gradient-coral text-primary-foreground animate-pulse" : ""}`}
+                  title={listening
+                    ? (lang === "tr" ? "Dinlemeyi durdur" : "Stop listening")
+                    : (lang === "tr" ? "Sesli anlat" : "Speak")}
+                >
+                  {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                </Button>
+              )}
               <Button
                 onClick={sendMessage}
                 disabled={!input.trim() || thinking || generating}
