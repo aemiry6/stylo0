@@ -42,7 +42,7 @@ const weatherFromCode = (code: number, temp: number) => {
 
 type WeatherStatus = "idle" | "prompting" | "loading" | "ready" | "denied" | "error";
 
-export const SuggestPanel = ({ onResult }: Props) => {
+export const SuggestPanel = forwardRef<SuggestPanelHandle, Props>(({ onResult }, ref) => {
   const { t, lang } = useLang();
   const { wardrobe, setOutfit, outfit, savedOutfits } = useWardrobe();
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -53,6 +53,8 @@ export const SuggestPanel = ({ onResult }: Props) => {
   const [thinking, setThinking] = useState(false);
   const [generating, setGenerating] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const lastContextRef = useRef<{ purposeKey: string; purposeSummary: string; formality: string } | null>(null);
+
 
   // Speech-to-text (Web Speech API)
   const recognitionRef = useRef<any>(null);
