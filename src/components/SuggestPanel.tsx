@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Sun, Cloud, CloudRain, Snowflake, Flame, CloudSnow, CloudDrizzle, CloudFog,
-  Loader2, Sparkles, MapPin, AlertCircle, Send, RefreshCw,
+  Loader2, Sparkles, MapPin, AlertCircle, Send, RefreshCw, Mic, MicOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
