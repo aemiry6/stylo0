@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Sun, Cloud, CloudRain, Snowflake, Flame, CloudSnow, CloudDrizzle, CloudFog,
-  Loader2, Sparkles, MapPin, AlertCircle, Send, RefreshCw,
+  Loader2, Sparkles, MapPin, AlertCircle, Send, RefreshCw, Mic, MicOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -50,6 +50,68 @@ export const SuggestPanel = ({ onResult }: Props) => {
   const [thinking, setThinking] = useState(false);
   const [generating, setGenerating] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Speech-to-text (Web Speech API)
+  const recognitionRef = useRef<any>(null);
+  const [listening, setListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const baseInputRef = useRef("");
+
+  useEffect(() => {
+    const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SR) setSpeechSupported(true);
+  }, []);
+
+  const langToBCP47 = (l: string) =>
+    l === "tr" ? "tr-TR" : l === "de" ? "de-DE" : l === "es" ? "es-ES" : "en-US";
+
+  const stopListening = () => {
+    try { recognitionRef.current?.stop(); } catch { /* noop */ }
+    setListening(false);
+  };
+
+  const toggleListening = () => {
+    if (listening) { stopListening(); return; }
+    const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) {
+      toast.error(lang === "tr" ? "Tarayıcın sesli girişi desteklemiyor" : "Your browser doesn't support voice input");
+      return;
+    }
+    const rec = new SR();
+    rec.lang = langToBCP47(lang);
+    rec.continuous = true;
+    rec.interimResults = true;
+    baseInputRef.current = input ? input.trim() + " " : "";
+    rec.onresult = (e: any) => {
+      let finalText = "";
+      let interim = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const transcript = e.results[i][0].transcript;
+        if (e.results[i].isFinal) finalText += transcript;
+        else interim += transcript;
+      }
+      if (finalText) baseInputRef.current += finalText;
+      setInput((baseInputRef.current + interim).replace(/\s+/g, " ").trimStart());
+    };
+    rec.onerror = (e: any) => {
+      console.error("speech error", e);
+      setListening(false);
+      if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+        toast.error(lang === "tr" ? "Mikrofon izni gerekli" : "Microphone permission required");
+      }
+    };
+    rec.onend = () => setListening(false);
+    recognitionRef.current = rec;
+    try {
+      rec.start();
+      setListening(true);
+    } catch (err) {
+      console.error(err);
+      setListening(false);
+    }
+  };
+
+  useEffect(() => () => { try { recognitionRef.current?.stop(); } catch { /* noop */ } }, []);
 
   // Reset greeting on language switch (only if chat is fresh)
   useEffect(() => {
@@ -150,9 +212,11 @@ export const SuggestPanel = ({ onResult }: Props) => {
   const sendMessage = async () => {
     const text = input.trim();
     if (!text || thinking || generating) return;
+    if (listening) stopListening();
     const next = [...messages, { role: "user" as const, content: text }];
     setMessages(next);
     setInput("");
+    baseInputRef.current = "";
     setThinking(true);
     try {
       const weatherCtx = weather
@@ -248,6 +312,20 @@ export const SuggestPanel = ({ onResult }: Props) => {
               disabled={thinking || generating}
             />
             <div className="flex gap-2">
+              {speechSupported && (
+                <Button
+                  onClick={toggleListening}
+                  disabled={thinking || generating}
+                  variant={listening ? "default" : "outline"}
+                  size="lg"
+                  className={`h-12 rounded-full ${listening ? "bg-gradient-coral text-primary-foreground animate-pulse" : ""}`}
+                  title={listening
+                    ? (lang === "tr" ? "Dinlemeyi durdur" : "Stop listening")
+                    : (lang === "tr" ? "Sesli anlat" : "Speak")}
+                >
+                  {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                </Button>
+              )}
               <Button
                 onClick={sendMessage}
                 disabled={!input.trim() || thinking || generating}
