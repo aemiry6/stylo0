@@ -51,6 +51,68 @@ export const SuggestPanel = ({ onResult }: Props) => {
   const [generating, setGenerating] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Speech-to-text (Web Speech API)
+  const recognitionRef = useRef<any>(null);
+  const [listening, setListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const baseInputRef = useRef("");
+
+  useEffect(() => {
+    const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SR) setSpeechSupported(true);
+  }, []);
+
+  const langToBCP47 = (l: string) =>
+    l === "tr" ? "tr-TR" : l === "de" ? "de-DE" : l === "es" ? "es-ES" : "en-US";
+
+  const stopListening = () => {
+    try { recognitionRef.current?.stop(); } catch { /* noop */ }
+    setListening(false);
+  };
+
+  const toggleListening = () => {
+    if (listening) { stopListening(); return; }
+    const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) {
+      toast.error(lang === "tr" ? "Tarayıcın sesli girişi desteklemiyor" : "Your browser doesn't support voice input");
+      return;
+    }
+    const rec = new SR();
+    rec.lang = langToBCP47(lang);
+    rec.continuous = true;
+    rec.interimResults = true;
+    baseInputRef.current = input ? input.trim() + " " : "";
+    rec.onresult = (e: any) => {
+      let finalText = "";
+      let interim = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const transcript = e.results[i][0].transcript;
+        if (e.results[i].isFinal) finalText += transcript;
+        else interim += transcript;
+      }
+      if (finalText) baseInputRef.current += finalText;
+      setInput((baseInputRef.current + interim).replace(/\s+/g, " ").trimStart());
+    };
+    rec.onerror = (e: any) => {
+      console.error("speech error", e);
+      setListening(false);
+      if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+        toast.error(lang === "tr" ? "Mikrofon izni gerekli" : "Microphone permission required");
+      }
+    };
+    rec.onend = () => setListening(false);
+    recognitionRef.current = rec;
+    try {
+      rec.start();
+      setListening(true);
+    } catch (err) {
+      console.error(err);
+      setListening(false);
+    }
+  };
+
+  useEffect(() => () => { try { recognitionRef.current?.stop(); } catch { /* noop */ } }, []);
+
   // Reset greeting on language switch (only if chat is fresh)
   useEffect(() => {
     setMessages((prev) => (prev.length === 1 && prev[0].role === "assistant" ? [{ role: "assistant", content: t.suggest.chatGreeting }] : prev));
