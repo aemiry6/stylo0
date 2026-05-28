@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import {
   Sun, Cloud, CloudRain, Snowflake, Flame, CloudSnow, CloudDrizzle, CloudFog,
   Loader2, Sparkles, MapPin, AlertCircle, Send, RefreshCw, Mic, MicOff,
@@ -12,7 +12,10 @@ import { toast } from "sonner";
 
 type Weather = "sunny" | "cloudy" | "rainy" | "cold" | "hot";
 
+export type SuggestPanelHandle = { regenerate: () => Promise<void> };
+
 type Props = { onResult: () => void };
+
 
 type WeatherData = {
   key: Weather;
@@ -39,7 +42,7 @@ const weatherFromCode = (code: number, temp: number) => {
 
 type WeatherStatus = "idle" | "prompting" | "loading" | "ready" | "denied" | "error";
 
-export const SuggestPanel = ({ onResult }: Props) => {
+export const SuggestPanel = forwardRef<SuggestPanelHandle, Props>(({ onResult }, ref) => {
   const { t, lang } = useLang();
   const { wardrobe, setOutfit, outfit, savedOutfits } = useWardrobe();
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -50,6 +53,8 @@ export const SuggestPanel = ({ onResult }: Props) => {
   const [thinking, setThinking] = useState(false);
   const [generating, setGenerating] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const lastContextRef = useRef<{ purposeKey: string; purposeSummary: string; formality: string } | null>(null);
+
 
   // Speech-to-text (Web Speech API)
   const recognitionRef = useRef<any>(null);
@@ -166,6 +171,8 @@ export const SuggestPanel = ({ onResult }: Props) => {
   }, []);
 
   const composeOutfit = async (purposeKey: string, purposeSummary: string, formality: string) => {
+    lastContextRef.current = { purposeKey, purposeSummary, formality };
+
     if (wardrobe.length < 2) {
       toast.error(lang === "tr" ? "Önce dolabını yükle" : "Upload your wardrobe first");
       return;
@@ -344,7 +351,9 @@ export const SuggestPanel = ({ onResult }: Props) => {
       </div>
     </section>
   );
-};
+});
+SuggestPanel.displayName = "SuggestPanel";
+
 
 const WeatherCard = ({
   status, weather, lang, t, onRetry, manualWeather, onManualWeatherChange,
