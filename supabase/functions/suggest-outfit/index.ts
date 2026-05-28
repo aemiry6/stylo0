@@ -13,25 +13,36 @@ Compose the BEST outfit using ONLY items that exist in the wardrobe (match by id
 
 Hard rules:
 - Match weight to weather: hot/sunny -> light only, cold/snow -> heavy outer required, rainy -> water-resistant outer if possible.
-- Match formality precisely to the requested formality target and the nuance of the occasion summary (e.g. first business dinner = polished smart, never athletic).
+- Match formality PRECISELY to the requested target. This is the most important rule.
 - Prefer harmonious color combinations (complementary, analogous, or a confident neutral base + one accent).
-- Use 3-6 items. Required: at least one top + one bottom (or a dress) + shoes. Strongly prefer adding layering pieces and accessories when the wardrobe allows.
+- Use 3-6 items. Required: at least one top + one bottom (or a dress) + shoes.
 
-Layering & sophistication (IMPORTANT):
-- Whenever the wardrobe and weather allow, build LAYERED looks instead of basic top+bottom+shoes. Examples: shirt under a sweater, sweater under a blazer/coat, t-shirt under an open shirt, dress with a jacket and belt, knit vest over shirt, cardigan over tee.
-- Mix textures and patterns deliberately: e.g. striped shirt + solid knit + tailored trousers; denim + chunky knit + wool coat; print blouse + neutral blazer.
-- Add finishing accessories (belt, scarf, watch, bag, jewelry, hat, sunglasses) when they elevate the outfit — not just for the sake of it.
-- Avoid the predictable "sweater + pants + shoes" formula unless the wardrobe truly cannot support more, or the occasion explicitly calls for minimalism. Aim for stylist-level combinations like: black trousers + white striped shirt + brown knit + loafers + leather belt.
-- Keep the silhouette balanced (e.g. relaxed top with tailored bottom, or fitted top with wide bottom).
+FORMALITY DISCIPLINE (CRITICAL — read carefully):
+- smart / formal (e.g. business dinner, work meeting, interview, wedding, gala):
+  * ONLY use polished pieces: tailored trousers/skirt, dress shirt/blouse, blazer, knit, dress, loafers/oxfords/heels/derbies, leather belt, structured bag, watch, subtle jewelry.
+  * NEVER include: sneakers, trainers, hoodies, sweatshirts, t-shirts with prints, athletic wear, joggers, shorts, caps, beanies, baseball hats, bucket hats, sunglasses (unless outdoor daytime), backpacks, sporty/athletic items, flip-flops, sandals.
+  * If the wardrobe truly lacks formal shoes, pick the cleanest minimal sneaker only as a last resort and mention the compromise in the rationale.
+- smart_casual (dinner with friends, nicer date, office casual):
+  * Tailored or clean-cut pieces; clean leather sneakers are OK; no athletic wear, no caps, no hoodies.
+- casual / very_casual: relaxed pieces fine; still avoid pure gym wear unless asked.
+- sport / gym: athletic pieces only.
+- NEVER add a hat, cap, beanie or sunglasses unless (a) the weather requires it (cold -> beanie, very sunny outdoor -> cap/sunglasses) AND (b) the formality allows it. For any smart/formal occasion, NO hats. EVER.
+- Accessories must serve the look: a leather belt or watch elevates smart looks; a baseball cap does not belong at a business dinner.
+
+Layering & sophistication:
+- When the wardrobe and weather allow, build LAYERED looks instead of basic top+bottom+shoes. Examples: shirt under a knit, knit under a blazer, t-shirt under an open shirt, dress with a jacket and belt.
+- Mix textures and patterns deliberately. Keep the silhouette balanced (relaxed top + tailored bottom, or fitted top + wide bottom).
+- Aim for stylist-level combinations like: black trousers + white striped shirt + brown knit + loafers + leather belt.
 
 Variety rules (CRITICAL):
-- You will receive a list of recently saved/worn outfits with dates. Treat anything from the last 7 days as "this week" and the last 30 days as "this month".
+- You will receive a list of recently saved/worn outfits with dates. Treat last 7 days as "this week", last 30 days as "this month".
 - Never repeat the exact same combination of item ids from this week.
 - Avoid reusing more than ONE item that appeared in any outfit from this week. From this month, avoid reusing more than TWO items together.
-- Actively change the silhouette, dominant color, or layering vs. the most recent outfits — the user should feel a new look, not a remix.
+- Actively change the silhouette, dominant color, or layering vs. the most recent outfits.
 - If the wardrobe is small and you must reuse items, pair them with different partners and explain the twist in the rationale.
 
-Always respond via the tool. Rationale must (a) tie the outfit to the occasion summary in one warm sentence, and (b) briefly note how it differs from recent looks.`;
+Always respond via the tool. Rationale must (a) tie the outfit to the occasion + formality in one warm sentence, and (b) briefly note how it differs from recent looks.`;
+
 
 const tool = {
   type: "function",
