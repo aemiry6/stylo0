@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import {
   Sun, Cloud, CloudRain, Snowflake, Flame, CloudSnow, CloudDrizzle, CloudFog,
   Loader2, Sparkles, MapPin, AlertCircle, Send, RefreshCw, Mic, MicOff,
@@ -12,7 +12,10 @@ import { toast } from "sonner";
 
 type Weather = "sunny" | "cloudy" | "rainy" | "cold" | "hot";
 
+export type SuggestPanelHandle = { regenerate: () => Promise<void> };
+
 type Props = { onResult: () => void };
+
 
 type WeatherData = {
   key: Weather;
