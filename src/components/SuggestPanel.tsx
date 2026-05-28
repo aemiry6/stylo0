@@ -171,6 +171,8 @@ export const SuggestPanel = forwardRef<SuggestPanelHandle, Props>(({ onResult },
   }, []);
 
   const composeOutfit = async (purposeKey: string, purposeSummary: string, formality: string) => {
+    lastContextRef.current = { purposeKey, purposeSummary, formality };
+
     if (wardrobe.length < 2) {
       toast.error(lang === "tr" ? "Önce dolabını yükle" : "Upload your wardrobe first");
       return;
