@@ -212,9 +212,11 @@ export const SuggestPanel = ({ onResult }: Props) => {
   const sendMessage = async () => {
     const text = input.trim();
     if (!text || thinking || generating) return;
+    if (listening) stopListening();
     const next = [...messages, { role: "user" as const, content: text }];
     setMessages(next);
     setInput("");
+    baseInputRef.current = "";
     setThinking(true);
     try {
       const weatherCtx = weather
